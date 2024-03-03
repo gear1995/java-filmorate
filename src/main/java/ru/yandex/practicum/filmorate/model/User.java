@@ -9,7 +9,7 @@ import java.util.Objects;
 
 @Data
 public class User {
-    private static int ID;
+    private static int ID = 1;
     private final int id;
     @Email
     @NonNull
