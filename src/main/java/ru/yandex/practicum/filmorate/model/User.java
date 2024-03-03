@@ -5,12 +5,10 @@ import lombok.NonNull;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import java.util.Objects;
 
 @Data
 public class User {
-    private static int ID = 1;
-    private final int id;
+    private int id;
     @Email
     @NonNull
     @NotBlank
@@ -31,6 +29,8 @@ public class User {
         } else {
             this.name = name.trim();
         }
-        this.id = Objects.requireNonNullElseGet(id, () -> ID++);
+        if (id != null) {
+            this.id = id;
+        }
     }
 }

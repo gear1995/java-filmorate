@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 public class FilmController {
     private List<Film> films = new ArrayList<>();
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static int ID = 1;
 
     @GetMapping(value = "/films")
     public List<Film> findAll() {
@@ -26,6 +27,8 @@ public class FilmController {
     @PostMapping(value = "/films")
     public Film create(@RequestBody @Valid Film film) {
         validateFilm(film);
+        film.setId(ID);
+        ID++;
         films.add(film);
         log.debug("Добавлен фильм: {}", film.getName());
         return film;

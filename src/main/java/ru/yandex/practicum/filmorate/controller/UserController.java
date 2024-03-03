@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public class UserController {
     private List<User> users = new ArrayList<>();
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static int ID = 1;
 
     @GetMapping("/users")
     public List<User> findAll() {
@@ -27,6 +28,8 @@ public class UserController {
     @PostMapping(value = "/users")
     public User create(@RequestBody @Valid User user) {
         validateUser(user);
+        user.setId(ID);
+        ID++;
         users.add(user);
         log.debug("Добавлен пользователь: {}", user.getName());
         return user;

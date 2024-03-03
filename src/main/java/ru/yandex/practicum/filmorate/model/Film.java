@@ -4,15 +4,13 @@ import lombok.Data;
 import lombok.NonNull;
 
 import javax.validation.constraints.NotBlank;
-import java.util.Objects;
 
 /**
  * Film.
  */
 @Data
 public class Film {
-    private static int ID = 1;
-    private final int id;
+    private int id = 1;
     @NonNull
     @NotBlank
     private String name;
@@ -25,6 +23,8 @@ public class Film {
         this.description = description.trim();
         this.releaseDate = releaseDate.trim();
         this.duration = duration;
-        this.id = Objects.requireNonNullElseGet(id, () -> ID++);
+        if (id != null) {
+            this.id = id;
+        }
     }
 }
