@@ -34,12 +34,14 @@ public class FilmController {
     @PutMapping("/films")
     public Film update(@RequestBody @Valid Film film) {
         validateFilm(film);
-        films = films.stream()
-                .filter(savedFilm -> savedFilm.getId() != film.getId())
-                .collect(Collectors.toList());
-        films.add(film);
-        log.debug("Обновлен фильм: {}", film.getName());
-        return film;
+        if (films.stream().anyMatch(savedFilm -> savedFilm.getId() == film.getId())) {
+            films = films.stream()
+                    .filter(savedFilm -> savedFilm.getId() != film.getId())
+                    .collect(Collectors.toList());
+            films.add(film);
+            log.debug("Обновлен фильм: {}", film.getName());
+            return film;
+        } else throw new ValidationException(String.format("Film with this id \"%s\" wasn't found", film.getId()));
     }
 
     private void validateFilm(Film film) {

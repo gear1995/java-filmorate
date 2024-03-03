@@ -35,12 +35,14 @@ public class UserController {
     @PutMapping(value = "/users")
     public User update(@RequestBody @Valid User user) {
         validateUser(user);
-        users = users.stream()
-                .filter(savedUser -> savedUser.getId() != user.getId())
-                .collect(Collectors.toList());
-        users.add(user);
-        log.debug("Обновлен пользователь: {}", user.getName());
-        return user;
+        if (users.stream().anyMatch(savedUser -> savedUser.getId() == user.getId())) {
+            users = users.stream()
+                    .filter(savedUser -> savedUser.getId() != user.getId())
+                    .collect(Collectors.toList());
+            users.add(user);
+            log.debug("Обновлен пользователь: {}", user.getName());
+            return user;
+        } else throw new ValidationException(String.format("User with this id \"%s\" wasn't found", user.getId()));
     }
 
     private void validateUser(User user) {
