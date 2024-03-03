@@ -23,7 +23,7 @@ public class FilmController {
         return films;
     }
 
-    @PostMapping(value = "/film")
+    @PostMapping(value = "/films")
     public Film create(@RequestBody @Valid Film film) {
         validateFilm(film);
         films.add(film);
@@ -31,7 +31,7 @@ public class FilmController {
         return film;
     }
 
-    @PutMapping("/film")
+    @PutMapping("/films")
     public Film update(@RequestBody @Valid Film film) {
         validateFilm(film);
         films = films.stream()

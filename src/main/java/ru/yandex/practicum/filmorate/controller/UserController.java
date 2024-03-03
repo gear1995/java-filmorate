@@ -24,7 +24,7 @@ public class UserController {
         return users;
     }
 
-    @PostMapping(value = "/user")
+    @PostMapping(value = "/users")
     public User create(@RequestBody @Valid User user) {
         validateUser(user);
         users.add(user);
@@ -32,7 +32,7 @@ public class UserController {
         return user;
     }
 
-    @PutMapping(value = "/user")
+    @PutMapping(value = "/users")
     public User update(@RequestBody @Valid User user) {
         validateUser(user);
         users = users.stream()
