@@ -12,7 +12,7 @@ import java.util.HashMap;
 @RestController
 public class FilmController {
     private final HashMap<Integer, Film> films = new HashMap<>();
-    private static int ID = 1;
+    private static int ID;
 
     @GetMapping(value = "/films")
     public HashMap<Integer, Film> findAll() {

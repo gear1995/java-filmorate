@@ -12,7 +12,7 @@ import java.util.HashMap;
 @RestController
 public class UserController {
     private final HashMap<Integer, User> users = new HashMap<>();
-    private static int ID = 1;
+    private static int ID;
 
     @GetMapping("/users")
     public HashMap<Integer, User> findAll() {

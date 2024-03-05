@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 @Data
 @Slf4j
 public class User {
-    private int id = 1;
+    private int id;
     @Email
     private String email;
     @NotBlank
