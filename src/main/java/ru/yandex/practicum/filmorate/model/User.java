@@ -2,25 +2,30 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import ru.yandex.practicum.filmorate.exeption.ValidationException;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Data
+@Slf4j
 public class User {
-    private int id;
+    private int id = 1;
     @Email
-    @NonNull
-    @NotBlank
     private String email;
-    @NonNull
     @NotBlank
     private String login;
     private String name;
     @NonNull
     private String birthday;
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public User(@NonNull String email, @NonNull String login, @NonNull String birthday, String name, Integer id) {
+    public User(@Email String email, @NotBlank String login, @NonNull String birthday, String name, Integer id) {
+        validateUser(login.trim(), birthday.trim());
         this.email = email.trim();
         this.login = login.trim();
         this.birthday = birthday.trim();
@@ -31,6 +36,17 @@ public class User {
         }
         if (id != null) {
             this.id = id;
+        }
+    }
+
+    private void validateUser(String login, String birthday) {
+        if (login.contains(" ")) {
+            log.error("Login {} contains space", login);
+            throw new ValidationException(String.format("Login \"%s\" contains space", login));
+        }
+        if (LocalDate.parse(birthday, dateTimeFormatter).isAfter(LocalDate.now())) {
+            log.error("Birthday date {} is after than now", birthday);
+            throw new ValidationException(String.format("Birthday date \"%s\" is after than now: %s", birthday, LocalDateTime.now()));
         }
     }
 }
