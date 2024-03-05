@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
 
@@ -20,11 +19,11 @@ public class User {
     @NotBlank
     private String login;
     private String name;
-    @NonNull
+    @NotBlank
     private String birthday;
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public User(@Email String email, @NotBlank String login, @NonNull String birthday, String name, Integer id) {
+    public User(@Email String email, @NotBlank String login, @NotBlank String birthday, String name, Integer id) {
         validateUser(login.trim(), birthday.trim());
         this.email = email.trim();
         this.login = login.trim();
