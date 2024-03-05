@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 @Slf4j
@@ -15,8 +16,8 @@ public class UserController {
     private static int ID;
 
     @GetMapping("/users")
-    public HashMap<Integer, User> findAll() {
-        return users;
+    public ArrayList<User> findAll() {
+        return new ArrayList<>(users.values());
     }
 
     @PostMapping(value = "/users")
