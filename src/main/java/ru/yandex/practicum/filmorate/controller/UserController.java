@@ -11,16 +11,17 @@ import java.util.HashMap;
 
 @Slf4j
 @RestController
+@RequestMapping("/users")
 public class UserController {
     private final HashMap<Integer, User> users = new HashMap<>();
     private static int ID = 1;
 
-    @GetMapping("/users")
+    @GetMapping
     public ArrayList<User> findAll() {
         return new ArrayList<>(users.values());
     }
 
-    @PostMapping(value = "/users")
+    @PostMapping
     public User create(@RequestBody @Valid User user) {
         user.setId(ID);
         ID++;
@@ -29,7 +30,7 @@ public class UserController {
         return user;
     }
 
-    @PutMapping(value = "/users")
+    @PutMapping
     public User update(@RequestBody @Valid User user) {
         if (users.containsKey(user.getId())) {
             users.put(user.getId(), user);

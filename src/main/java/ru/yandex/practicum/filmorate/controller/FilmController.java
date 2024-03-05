@@ -11,16 +11,17 @@ import java.util.HashMap;
 
 @Slf4j
 @RestController
+@RequestMapping(value = "/films")
 public class FilmController {
     private final HashMap<Integer, Film> films = new HashMap<>();
     private static int ID = 1;
 
-    @GetMapping(value = "/films")
+    @GetMapping
     public ArrayList<Film> findAll() {
         return new ArrayList<>(films.values());
     }
 
-    @PostMapping(value = "/films")
+    @PostMapping
     public Film create(@RequestBody @Valid Film film) {
         film.setId(ID);
         ID++;
@@ -29,7 +30,7 @@ public class FilmController {
         return film;
     }
 
-    @PutMapping("/films")
+    @PutMapping
     public Film update(@RequestBody @Valid Film film) {
         if (films.containsKey(film.getId())) {
             films.put(film.getId(), film);
