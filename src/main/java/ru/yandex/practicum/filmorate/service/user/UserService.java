@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -15,7 +14,7 @@ public class UserService {
         this.inMemoryUserStorage = inMemoryUserStorage;
     }
 
-    public ArrayList<User> findAllUsers() {
+    public List<User> findAllUsers() {
         return inMemoryUserStorage.findAllUsers();
     }
 
