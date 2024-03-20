@@ -9,6 +9,8 @@ import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Slf4j
@@ -22,6 +24,7 @@ public class User {
     @NotBlank
     private String birthday;
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private Set<Integer> friends = new HashSet<>();
 
     public User(@Email String email, @NotBlank String login, @NotBlank String birthday, String name, Integer id) {
         validateUser(login.trim(), birthday.trim());
@@ -47,5 +50,13 @@ public class User {
             log.error("Birthday date {} is after than now", birthday);
             throw new ValidationException(String.format("Birthday date \"%s\" is after than now: %s", birthday, LocalDateTime.now()));
         }
+    }
+
+    public void addFriend(Integer friendId) {
+        friends.add(friendId);
+    }
+
+    public void deleteFriend(Integer friendId) {
+        friends.remove(friendId);
     }
 }

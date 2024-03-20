@@ -9,6 +9,8 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Film.
@@ -16,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 @Data
 @Slf4j
 public class Film {
-    private int id = 1;
+    private Integer id = 1;
     @NotBlank
     private String name;
     @Size(max = 200)
@@ -26,6 +28,7 @@ public class Film {
     @Positive
     private int duration;
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private Set<Integer> likes = new HashSet<>();
 
     public Film(@NotBlank String name, @Size(max = 200) String description, @NotBlank String releaseDate, @Positive int duration, Integer id) {
         validateFilmData(releaseDate);
@@ -43,5 +46,13 @@ public class Film {
             log.error("Release date {} is before than 28.12.1895", releaseDate);
             throw new ValidationException(String.format("Release date \"%s\" is before than 28.12.1895", releaseDate));
         }
+    }
+
+    public void setLike(Integer userId) {
+        likes.add(userId);
+    }
+
+    public void deleteLike(Integer userId) {
+        likes.remove(userId);
     }
 }
