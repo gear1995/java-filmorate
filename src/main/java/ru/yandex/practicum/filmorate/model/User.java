@@ -23,10 +23,16 @@ public class User {
     private String name;
     @NotBlank
     private String birthday;
-    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private Set<Integer> friends = new HashSet<>();
 
-    public User(@Email String email, @NotBlank String login, @NotBlank String birthday, String name, Integer id) {
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    public User(@Email String email,
+                @NotBlank String login,
+                @NotBlank String birthday,
+                String name,
+                Integer id,
+                Set<Integer> friends) {
         validateUser(login.trim(), birthday.trim());
         this.email = email.trim();
         this.login = login.trim();
@@ -38,6 +44,9 @@ public class User {
         }
         if (id != null) {
             this.id = id;
+        }
+        if (friends != null) {
+            this.friends = friends;
         }
     }
 

@@ -81,4 +81,9 @@ public class InMemoryUserStorage implements UserStorage {
                 .map(users::get)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public User findUserById(Integer id) {
+        return null;
+    }
 }

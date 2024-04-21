@@ -1,44 +1,49 @@
 package ru.yandex.practicum.filmorate.service.user;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
 
 @Service
 public class UserService {
-    private final InMemoryUserStorage inMemoryUserStorage;
+    private final UserStorage userDbStorage;
 
-    public UserService(InMemoryUserStorage inMemoryUserStorage) {
-        this.inMemoryUserStorage = inMemoryUserStorage;
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage) {
+        this.userDbStorage = userStorage;
     }
 
     public List<User> findAllUsers() {
-        return inMemoryUserStorage.findAllUsers();
+        return userDbStorage.findAllUsers();
     }
 
     public User createUser(User user) {
-        return inMemoryUserStorage.createUser(user);
+        return userDbStorage.createUser(user);
     }
 
     public User updateUser(User user) {
-        return inMemoryUserStorage.updateUser(user);
+        return userDbStorage.updateUser(user);
     }
 
     public void addFriend(Integer id, Integer friendId) {
-        inMemoryUserStorage.addFriend(id, friendId);
+        userDbStorage.addFriend(id, friendId);
     }
 
     public void deleteFriend(Integer id, Integer friendId) {
-        inMemoryUserStorage.deleteFriend(id, friendId);
+        userDbStorage.deleteFriend(id, friendId);
     }
 
     public List<User> getFriends(Integer id) {
-        return inMemoryUserStorage.getFriends(id);
+        return userDbStorage.getFriends(id);
     }
 
     public List<User> getCommonFriends(Integer id, Integer otherId) {
-        return inMemoryUserStorage.getCommonFriends(id, otherId);
+        return userDbStorage.getCommonFriends(id, otherId);
+    }
+
+    public User findUserById(Integer id) {
+        return userDbStorage.findUserById(id);
     }
 }
