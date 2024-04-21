@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -39,5 +40,35 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.error("Film with this id {} wasn't found", film.getId());
             throw new FilmNotFoundException(film.getId());
         }
+    }
+
+    @Override
+    public List<String> getGenresList() {
+        return null;
+    }
+
+    @Override
+    public List<String> getFilmGenres(Integer filmId) {
+        return null;
+    }
+
+    @Override
+    public Optional<Film> setLike(Integer filmId, Integer userId) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Film> findFilmById(Integer filmId) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Film> deleteLike(Integer filmId, Integer userId) {
+        return Optional.empty();
+    }
+
+    @Override
+    public List<Film> getPopularFilms(Integer count) {
+        return null;
     }
 }

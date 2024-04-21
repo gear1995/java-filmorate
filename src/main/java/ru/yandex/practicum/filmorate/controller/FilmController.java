@@ -7,9 +7,10 @@ import ru.yandex.practicum.filmorate.service.film.FilmService;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping(value = "/films")
+@RequestMapping(value = "films")
 public class FilmController {
     private final FilmService filmService;
 
@@ -33,17 +34,27 @@ public class FilmController {
     }
 
     @PutMapping(value = "{filmId}/like/{userId}")
-    public Film setLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
+    public Optional<Film> setLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
         return filmService.setLike(filmId, userId);
     }
 
     @DeleteMapping(value = "{filmId}/like/{userId}")
-    public Film deleteLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
+    public Optional<Film> deleteLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
         return filmService.deleteLike(filmId, userId);
     }
 
     @GetMapping(value = "popular")
     public List<Film> getPopularFilms(@RequestParam(required = false) @Positive Integer count) {
         return filmService.getPopularFilms(count);
+    }
+
+    @GetMapping(value = "genres")
+    public List<String> getGenres() {
+        return filmService.getGenresList();
+    }
+
+    @GetMapping(value = "genres/{id}")
+    public List<String> getFilmGenres(@PathVariable Integer id) {
+        return filmService.getFilmGenres(id);
     }
 }
