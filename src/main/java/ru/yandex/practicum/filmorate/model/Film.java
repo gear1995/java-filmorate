@@ -28,8 +28,8 @@ public class Film {
     @Positive
     private int duration;
     private Set<Integer> likes;
-    private ArrayList<String> genreList;
-    private String mpaRating;
+    private ArrayList<String> genres;
+    private String mpa;
 
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -48,9 +48,9 @@ public class Film {
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-        this.genreList = genreList;
+        this.genres = genreList;
         this.likes = likes;
-        this.mpaRating = mpaRating;
+        this.mpa = mpaRating;
     }
 
     public void validateFilmData(String releaseDate) {

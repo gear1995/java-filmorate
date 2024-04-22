@@ -78,10 +78,10 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film createFilm(Film film) {
         Set<Integer> filmLikes = film.getLikes();
-        ArrayList<String> genreList = film.getGenreList();
+        ArrayList<String> genreList = film.getGenres();
         SqlRowSet filmsRows = jdbcTemplate.queryForRowSet(
                 "SELECT MPA_RATING_NAME FROM MPA_RATING WHERE MPA_RATING_ID = ?",
-                film.getMpaRating());
+                film.getMpa());
 
         String mpaRatingName = null;
         if (filmsRows.next()) {
@@ -125,7 +125,7 @@ public class FilmDbStorage implements FilmStorage {
     public Film updateFilm(Film film) {
         validateFilmExist(film.getId());
         Set<Integer> filmLikes = film.getLikes();
-        ArrayList<String> genreList = film.getGenreList();
+        ArrayList<String> genreList = film.getGenres();
 
         if (filmLikes != null) {
             filmLikes.forEach(user ->
@@ -154,7 +154,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.getDescription(),
                 film.getReleaseDate(),
                 film.getDuration(),
-                film.getMpaRating(),
+                film.getMpa(),
                 film.getId());
 
         log.debug("Обновлен фильм: {}", film.getName());
