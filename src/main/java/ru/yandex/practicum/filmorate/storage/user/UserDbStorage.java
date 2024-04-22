@@ -102,7 +102,8 @@ public class UserDbStorage implements UserStorage {
         }
 
         log.debug("Добавлен фильм: {}", user.getName());
-        return user;
+
+        return findUserById(userId.intValue());
     }
 
     @Override
@@ -129,7 +130,8 @@ public class UserDbStorage implements UserStorage {
         );
 
         log.debug("Обновлен пользователь: {}", user.getName());
-        return user;
+
+        return findUserById(user.getId());
     }
 
 
