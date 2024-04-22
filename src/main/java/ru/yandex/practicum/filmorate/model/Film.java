@@ -41,7 +41,6 @@ public class Film {
                 ArrayList<String> genreList,
                 Set<Integer> likes,
                 String mpaRating) {
-        validateFilmData(releaseDate);
         if (id != null) {
             this.id = id;
         }
@@ -54,7 +53,7 @@ public class Film {
         this.mpaRating = mpaRating;
     }
 
-    private void validateFilmData(String releaseDate) {
+    public void validateFilmData(String releaseDate) {
         if (LocalDate.parse(releaseDate, dateTimeFormatter).isBefore(LocalDate.of(1895, 12, 28))) {
             log.error("Release date {} is before than 28.12.1895", releaseDate);
             throw new ValidationException(String.format("Release date \"%s\" is before than 28.12.1895", releaseDate));

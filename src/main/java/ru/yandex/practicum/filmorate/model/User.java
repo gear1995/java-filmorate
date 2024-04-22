@@ -33,7 +33,6 @@ public class User {
                 String name,
                 Integer id,
                 Set<Integer> friends) {
-        validateUser(login.trim(), birthday.trim());
         this.email = email.trim();
         this.login = login.trim();
         this.birthday = birthday.trim();
@@ -50,7 +49,7 @@ public class User {
         }
     }
 
-    private void validateUser(String login, String birthday) {
+    public void validateUser(String login, String birthday) {
         if (login.contains(" ")) {
             log.error("Login {} contains space", login);
             throw new ValidationException(String.format("Login \"%s\" contains space", login));

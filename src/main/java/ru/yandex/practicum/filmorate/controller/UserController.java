@@ -29,11 +29,13 @@ public class UserController {
 
     @PostMapping
     public User create(@RequestBody @Valid User user) {
+        user.validateUser(user.getLogin(), user.getBirthday());
         return userService.createUser(user);
     }
 
     @PutMapping
     public User update(@RequestBody @Valid User user) {
+        user.validateUser(user.getLogin(), user.getBirthday());
         return userService.updateUser(user);
     }
 

@@ -25,11 +25,13 @@ public class FilmController {
 
     @PostMapping
     public Film create(@RequestBody @Valid Film film) {
+        film.validateFilmData(film.getReleaseDate());
         return filmService.createFilm(film);
     }
 
     @PutMapping
     public Film update(@RequestBody @Valid Film film) {
+        film.validateFilmData(film.getReleaseDate());
         return filmService.updateFilm(film);
     }
 
