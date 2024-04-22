@@ -8,6 +8,8 @@ create table IF NOT EXISTS USERS
     constraint USERS_PK
         primary key (USER_ID)
 );
+INSERT INTO USERS (USER_ID, EMAIL, NAME, BIRTHDAY, LOGIN)
+VALUES ( 0, 'email', 'name', '1976-09-20', 'login');
 
 create table IF NOT EXISTS MPA_RATING
 (
@@ -31,6 +33,8 @@ create table IF NOT EXISTS FILMS
     constraint FILMS_MPA_RATING_MPA_RATING_ID_FK
         foreign key (MPA_RATING_ID) references MPA_RATING
 );
+INSERT INTO FILMS (FILM_NAME, RELEASE_DATE)
+VALUES ( 'film name', '2020-08-08');
 
 create table IF NOT EXISTS FILM_LIKES
 (
@@ -64,6 +68,8 @@ create table IF NOT EXISTS GENRE
     constraint GENRE_PK
         primary key (GENRE_ID)
 );
+INSERT INTO GENRE (GENRE_NAME)
+VALUES ( 'genre name');
 
 create table IF NOT EXISTS FILM_GENRE
 (
