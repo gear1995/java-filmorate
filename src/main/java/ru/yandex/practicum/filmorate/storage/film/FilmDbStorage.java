@@ -118,7 +118,7 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         log.debug("Добавлен фильм: {}", film.getName());
-        return film;
+        return findFilmById(filmId.intValue()).get();
     }
 
     @Override
@@ -158,7 +158,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.getId());
 
         log.debug("Обновлен фильм: {}", film.getName());
-        return film;
+        return findFilmById(film.getId()).get();
     }
 
     @Override
