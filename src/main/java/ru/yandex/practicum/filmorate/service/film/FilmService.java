@@ -53,4 +53,12 @@ public class FilmService {
     public List<String> getFilmGenres(Integer filmId) {
         return filmStorage.getFilmGenres(filmId);
     }
+
+    public String getMpaById(Integer id) {
+        return filmStorage.getMpaById(id);
+    }
+
+    public List<String> getMpa() {
+        return filmStorage.getMpa();
+    }
 }

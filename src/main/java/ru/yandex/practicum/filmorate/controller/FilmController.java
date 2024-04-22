@@ -59,4 +59,14 @@ public class FilmController {
     public List<String> getFilmGenres(@PathVariable Integer id) {
         return filmService.getFilmGenres(id);
     }
+
+    @GetMapping(value = "mpa/{id}")
+    public String getMpa(@PathVariable Integer id) {
+        return filmService.getMpaById(id);
+    }
+
+    @GetMapping(value = "mpa")
+    public List<String> getMpa() {
+        return filmService.getMpa();
+    }
 }

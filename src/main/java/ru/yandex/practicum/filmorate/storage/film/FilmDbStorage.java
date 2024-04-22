@@ -232,6 +232,26 @@ public class FilmDbStorage implements FilmStorage {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public String getMpaById(Integer id) {
+        SqlRowSet mpaRows = jdbcTemplate.queryForRowSet("SELECT MPA_RATING_NAME FROM MPA_RATING WHERE MPA_RATING_ID = ?", id);
+        String mpaRatingName = null;
+        if (mpaRows.next()) {
+            mpaRatingName = mpaRows.getString("MPA_RATING_NAME");
+        }
+        return mpaRatingName;
+    }
+
+    @Override
+    public List<String> getMpa() {
+        SqlRowSet mpaRows = jdbcTemplate.queryForRowSet("SELECT MPA_RATING_NAME FROM MPA_RATING");
+        List<String> mpaRatingName = new ArrayList<>();
+        if (mpaRows.next()) {
+            mpaRatingName.add(mpaRows.getString("MPA_RATING_NAME"));
+        }
+        return mpaRatingName;
+    }
+
     private void validateFilmExist(Integer filmId) {
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet("SELECT FILM_ID FROM FILMS WHERE FILM_ID = ?", filmId);
         if (!filmRows.next()) {

@@ -71,4 +71,14 @@ public class InMemoryFilmStorage implements FilmStorage {
     public List<Film> getPopularFilms(Integer count) {
         return null;
     }
+
+    @Override
+    public String getMpaById(Integer id) {
+        return null;
+    }
+
+    @Override
+    public List<String> getMpa() {
+        return null;
+    }
 }

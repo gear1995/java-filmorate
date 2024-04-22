@@ -23,4 +23,8 @@ public interface FilmStorage {
     Optional<Film> deleteLike(Integer filmId, Integer userId);
 
     List<Film> getPopularFilms(Integer count);
+
+    String getMpaById(Integer id);
+
+    List<String> getMpa();
 }
