@@ -39,7 +39,7 @@ public class UserService {
         return userDbStorage.getFriends(id);
     }
 
-    public List<User> getCommonFriends(Integer id, Integer otherId) {
+    public Integer getCommonFriends(Integer id, Integer otherId) {
         return userDbStorage.getCommonFriends(id, otherId);
     }
 

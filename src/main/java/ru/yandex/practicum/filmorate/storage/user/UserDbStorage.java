@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.exeption.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -174,9 +173,9 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public List<User> getCommonFriends(Integer userId, Integer otherUserId) {
+    public Integer getCommonFriends(Integer userId, Integer otherUserId) {
         List<User> userFriends = getFriends(userId);
         List<User> otherUserFriends = getFriends(otherUserId);
-        return userFriends.stream().filter(otherUserFriends::contains).collect(Collectors.toList());
+        return (int) userFriends.stream().filter(otherUserFriends::contains).count();
     }
 }

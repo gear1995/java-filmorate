@@ -73,13 +73,12 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public List<User> getCommonFriends(Integer id, Integer otherId) {
+    public Integer getCommonFriends(Integer id, Integer otherId) {
         validateUserExist(id);
         validateUserExist(otherId);
-        return users.get(id).getFriends().stream()
+        return (int) users.get(id).getFriends().stream()
                 .filter(friendId -> users.get(otherId).getFriends().contains(friendId))
-                .map(users::get)
-                .collect(Collectors.toList());
+                .map(users::get).count();
     }
 
     @Override
