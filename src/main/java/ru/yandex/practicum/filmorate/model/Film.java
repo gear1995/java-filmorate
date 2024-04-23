@@ -10,6 +10,7 @@ import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Set;
 
 /**
@@ -28,8 +29,8 @@ public class Film {
     @Positive
     private int duration;
     private Set<Integer> likes;
-    private ArrayList<String> genres;
-    private String mpa;
+    private HashMap<String, Integer> genres;
+    private HashMap<String, Integer> mpa;
 
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -38,9 +39,9 @@ public class Film {
                 @Size(max = 200) String description,
                 @NotBlank String releaseDate,
                 @Positive int duration,
-                ArrayList<String> genreList,
+                HashMap<String, Integer> genreList,
                 Set<Integer> likes,
-                String mpaRating) {
+                HashMap<String, Integer> mpaRating) {
         if (id != null) {
             this.id = id;
         }

@@ -43,12 +43,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<String> getGenresList() {
+    public HashMap<String, Integer> getGenresList() {
         return null;
     }
 
     @Override
-    public List<String> getFilmGenres(Integer filmId) {
+    public HashMap<String, Integer> getFilmGenres(Integer filmId) {
         return null;
     }
 
@@ -73,12 +73,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public String getMpaById(Integer id) {
+    public HashMap<String, Integer> getMpaById(Integer id) {
         return null;
     }
 
     @Override
-    public List<String> getMpa() {
+    public HashMap<String, Integer> getMpa() {
         return null;
     }
 }

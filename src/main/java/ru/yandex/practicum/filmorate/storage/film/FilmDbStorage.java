@@ -23,27 +23,29 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> findAllFilms() {
         SqlRowSet filmsRows = jdbcTemplate.queryForRowSet(
-                "select F.FILM_ID, FILM_NAME, DESCRIPTION, RELEASE_DATE, DURATION, F.MPA_RATING_ID, GENRE_NAME" +
-                        " from FILMS AS F" +
-                        " left join MPA_RATING MR ON F.MPA_RATING_ID = MR.MPA_RATING_ID" +
-                        " left join FILM_GENRE FG on F.FILM_ID = FG.FILM_ID" +
-                        " left join GENRE G ON FG.GENRE_ID = G.GENRE_ID;");
+                "SELECT F.FILM_ID, FILM_NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA_RATING_ID, FG.GENRE_ID" +
+                        " FROM FILMS AS F" +
+                        " LEFT JOIN FILM_GENRE FG ON F.FILM_ID = FG.FILM_ID" +
+                        " LEFT JOIN GENRE G ON FG.GENRE_ID = G.GENRE_ID;"
+        );
 
         List<Film> filmsList = new ArrayList<>();
         if (filmsRows.next()) {
-            ArrayList<String> genreList = getGenreListByFilmId(filmsRows);
+            HashMap<String, Integer> genresMap = getGenreIdMapByFilmId(filmsRows);
 
             Set<Integer> likeList = getLikesListByFilmId(filmsRows);
 
+            HashMap<String, Integer> mpaMap = new HashMap<>();
+            mpaMap.put("id", filmsRows.getInt("MPA_RATING_ID"));
             filmsList.add(new Film(
                     filmsRows.getInt("FILM_ID"),
                     filmsRows.getString("FILM_NAME"),
                     filmsRows.getString("DESCRIPTION"),
                     filmsRows.getString("RELEASE_DATE"),
                     filmsRows.getInt("DURATION"),
-                    genreList,
+                    genresMap,
                     likeList,
-                    filmsRows.getString("MPA_RATING_ID")
+                    mpaMap
             ));
         }
         return filmsList;
@@ -61,16 +63,30 @@ public class FilmDbStorage implements FilmStorage {
         return likeList;
     }
 
-    private ArrayList<String> getGenreListByFilmId(SqlRowSet filmsRows) {
+    private HashMap<String, String> getGenreNameMapByFilmId(SqlRowSet filmsRows) {
         SqlRowSet genreRows = jdbcTemplate.queryForRowSet(
-                "SELECT FILM_ID, GENRE_NAME FROM GENRE " +
-                        "left join FILM_GENRE FG on GENRE.GENRE_ID = FG.GENRE_ID WHERE FILM_ID = ?",
+                "SELECT GENRE_NAME FROM GENRE " +
+                        "LEFT JOIN FILM_GENRE FG on GENRE.GENRE_ID = FG.GENRE_ID WHERE FILM_ID = ?",
                 filmsRows.getString("FILM_ID")
         );
 
-        ArrayList<String> genreList = new ArrayList<>();
+        HashMap<String, String> genreList = new HashMap<>();
         if (genreRows.next()) {
-            genreList.add(genreRows.getString("GENRE_NAME"));
+            genreList.put("id", genreRows.getString("GENRE_NAME"));
+        }
+        return genreList;
+    }
+
+    private HashMap<String, Integer> getGenreIdMapByFilmId(SqlRowSet filmsRows) {
+        SqlRowSet genreRows = jdbcTemplate.queryForRowSet(
+                "SELECT FG.GENRE_ID FROM GENRE " +
+                        "LEFT JOIN FILM_GENRE FG on GENRE.GENRE_ID = FG.GENRE_ID WHERE FILM_ID = ?",
+                filmsRows.getString("FILM_ID")
+        );
+
+        HashMap<String, Integer> genreList = new HashMap<>();
+        if (genreRows.next()) {
+            genreList.put("id", genreRows.getInt("GENRE_ID"));
         }
         return genreList;
     }
@@ -78,7 +94,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film createFilm(Film film) {
         Set<Integer> filmLikes = film.getLikes();
-        ArrayList<String> genreList = film.getGenres();
+        HashMap<String, Integer> genresMap = film.getGenres();
         SqlRowSet filmsRows = jdbcTemplate.queryForRowSet(
                 "SELECT MPA_RATING_NAME FROM MPA_RATING WHERE MPA_RATING_ID = ?",
                 film.getMpa());
@@ -107,13 +123,9 @@ public class FilmDbStorage implements FilmStorage {
             );
         }
 
-        if (genreList != null) {
-            genreList.forEach(genre -> {
-                        SqlRowSet genreRowSet = jdbcTemplate.queryForRowSet("SELECT GENRE_ID FROM GENRE " +
-                                "WHERE GENRE_NAME = ?", genre);
-                        String genreId = genreRowSet.getString("GENRE_ID");
-                        jdbcTemplate.update("INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)", filmId, genreId);
-                    }
+        if (genresMap != null) {
+            genresMap.forEach((str, value) ->
+                    jdbcTemplate.update("INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)", filmId, value)
             );
         }
 
@@ -125,7 +137,7 @@ public class FilmDbStorage implements FilmStorage {
     public Film updateFilm(Film film) {
         validateFilmExist(film.getId());
         Set<Integer> filmLikes = film.getLikes();
-        ArrayList<String> genreList = film.getGenres();
+        HashMap<String, Integer> genresIdMap = film.getGenres();
 
         if (filmLikes != null) {
             filmLikes.forEach(user ->
@@ -133,15 +145,11 @@ public class FilmDbStorage implements FilmStorage {
             );
         }
 
-        if (genreList != null) {
-            genreList.forEach(genre -> {
-                        SqlRowSet genreRowSet = jdbcTemplate.queryForRowSet("SELECT GENRE_ID FROM GENRE " +
-                                "WHERE GENRE_NAME = ?", genre);
-                        String genreId = genreRowSet.getString("GENRE_ID");
-                        jdbcTemplate.update("INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)",
-                                film.getId(),
-                                genreId);
-                    }
+        if (genresIdMap != null) {
+            genresIdMap.forEach((str, genreId) ->
+                    jdbcTemplate.update("INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)",
+                            film.getId(),
+                            genreId)
             );
         }
 
@@ -162,24 +170,24 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<String> getGenresList() {
-        SqlRowSet genresRows = jdbcTemplate.queryForRowSet("SELECT GENRE_NAME FROM GENRE");
-        List<String> genreList = new ArrayList<>();
+    public HashMap<String, Integer> getGenresList() {
+        SqlRowSet genresRows = jdbcTemplate.queryForRowSet("SELECT GENRE_ID FROM GENRE");
+        HashMap<String, Integer> genreList = new HashMap<>();
         if (genresRows.next()) {
-            genreList.add(genresRows.getString("GENRE_NAME"));
+            genreList.put("id", genresRows.getInt("GENRE_ID"));
         }
         return genreList;
     }
 
     @Override
-    public List<String> getFilmGenres(Integer filmId) {
+    public HashMap<String, Integer> getFilmGenres(Integer filmId) {
         validateFilmExist(filmId);
 
-        SqlRowSet genresRows = jdbcTemplate.queryForRowSet("SELECT GENRE_NAME FROM GENRE " +
+        SqlRowSet genresRows = jdbcTemplate.queryForRowSet("SELECT FG.GENRE_ID FROM GENRE " +
                 "LEFT JOIN FILM_GENRE FG ON GENRE.GENRE_ID = FG.GENRE_ID WHERE FILM_ID = ?", filmId);
-        List<String> genreList = new ArrayList<>();
+        HashMap<String, Integer> genreList = new HashMap<>();
         if (genresRows.next()) {
-            genreList.add(genresRows.getString("GENRE_NAME"));
+            genreList.put("id", genresRows.getInt("FG.GENRE_ID"));
         }
         return genreList;
     }
@@ -195,9 +203,12 @@ public class FilmDbStorage implements FilmStorage {
         validateFilmExist(filmId);
         SqlRowSet filmsRows = jdbcTemplate.queryForRowSet("SELECT * FROM FILMS WRERE WHERE FILM_ID = ?", filmId);
         if (filmsRows.next()) {
-            ArrayList<String> genreList = getGenreListByFilmId(filmsRows);
+            HashMap<String, Integer> genresIdMap = getGenreIdMapByFilmId(filmsRows);
 
             Set<Integer> likeList = getLikesListByFilmId(filmsRows);
+
+            HashMap<String, Integer> mpaMap = new HashMap<>();
+            mpaMap.put("id", filmsRows.getInt("MPA_RATING_ID"));
 
             return Optional.of(new Film(
                     filmsRows.getInt("FILM_ID"),
@@ -205,9 +216,9 @@ public class FilmDbStorage implements FilmStorage {
                     filmsRows.getString("DESCRIPTION"),
                     filmsRows.getString("RELEASE_DATE"),
                     filmsRows.getInt("DURATION"),
-                    genreList,
+                    genresIdMap,
                     likeList,
-                    filmsRows.getString("MPA_RATING_ID")
+                    mpaMap
             ));
         }
         return Optional.empty();
@@ -233,21 +244,21 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public String getMpaById(Integer id) {
-        SqlRowSet mpaRows = jdbcTemplate.queryForRowSet("SELECT MPA_RATING_NAME FROM MPA_RATING WHERE MPA_RATING_ID = ?", id);
-        String mpaRatingName = null;
+    public HashMap<String, Integer> getMpaById(Integer id) {
+        SqlRowSet mpaRows = jdbcTemplate.queryForRowSet("SELECT MPA_RATING_ID FROM MPA_RATING WHERE MPA_RATING_ID = ?", id);
+        HashMap<String, Integer> mpaMap = new HashMap<>();
         if (mpaRows.next()) {
-            mpaRatingName = mpaRows.getString("MPA_RATING_NAME");
+            mpaMap.put("id", mpaRows.getInt("MPA_RATING_ID"));
         }
-        return mpaRatingName;
+        return mpaMap;
     }
 
     @Override
-    public List<String> getMpa() {
-        SqlRowSet mpaRows = jdbcTemplate.queryForRowSet("SELECT MPA_RATING_NAME FROM MPA_RATING");
-        List<String> mpaRatingName = new ArrayList<>();
+    public HashMap<String, Integer> getMpa() {
+        SqlRowSet mpaRows = jdbcTemplate.queryForRowSet("SELECT MPA_RATING_ID FROM MPA_RATING");
+        HashMap<String, Integer> mpaRatingName = new HashMap<>();
         if (mpaRows.next()) {
-            mpaRatingName.add(mpaRows.getString("MPA_RATING_NAME"));
+            mpaRatingName.put("id", mpaRows.getInt("MPA_RATING_ID"));
         }
         return mpaRatingName;
     }

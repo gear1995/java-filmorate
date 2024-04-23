@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.service.film.FilmService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,22 +52,22 @@ public class FilmController {
     }
 
     @GetMapping(value = "genres")
-    public List<String> getGenres() {
+    public HashMap<String, Integer> getGenres() {
         return filmService.getGenresList();
     }
 
     @GetMapping(value = "genres/{id}")
-    public List<String> getFilmGenres(@PathVariable Integer id) {
+    public HashMap<String, Integer> getFilmGenres(@PathVariable Integer id) {
         return filmService.getFilmGenres(id);
     }
 
     @GetMapping(value = "mpa/{id}")
-    public String getMpa(@PathVariable Integer id) {
+    public HashMap<String, Integer> getMpa(@PathVariable Integer id) {
         return filmService.getMpaById(id);
     }
 
     @GetMapping(value = "mpa")
-    public List<String> getMpa() {
+    public HashMap<String, Integer> getMpa() {
         return filmService.getMpa();
     }
 }

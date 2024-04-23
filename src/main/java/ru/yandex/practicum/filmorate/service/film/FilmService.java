@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,19 +47,19 @@ public class FilmService {
         return filmStorage.getPopularFilms(count);
     }
 
-    public List<String> getGenresList() {
+    public HashMap<String, Integer> getGenresList() {
         return filmStorage.getGenresList();
     }
 
-    public List<String> getFilmGenres(Integer filmId) {
+    public HashMap<String, Integer> getFilmGenres(Integer filmId) {
         return filmStorage.getFilmGenres(filmId);
     }
 
-    public String getMpaById(Integer id) {
+    public HashMap<String, Integer> getMpaById(Integer id) {
         return filmStorage.getMpaById(id);
     }
 
-    public List<String> getMpa() {
+    public HashMap<String, Integer> getMpa() {
         return filmStorage.getMpa();
     }
 }

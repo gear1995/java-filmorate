@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import ru.yandex.practicum.filmorate.model.Film;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,9 +13,9 @@ public interface FilmStorage {
 
     Film updateFilm(Film film);
 
-    List<String> getGenresList();
+    HashMap<String, Integer> getGenresList();
 
-    List<String> getFilmGenres(Integer filmId);
+    HashMap<String, Integer> getFilmGenres(Integer filmId);
 
     Optional<Film> setLike(Integer filmId, Integer userId);
 
@@ -24,7 +25,7 @@ public interface FilmStorage {
 
     List<Film> getPopularFilms(Integer count);
 
-    String getMpaById(Integer id);
+    HashMap<String, Integer> getMpaById(Integer id);
 
-    List<String> getMpa();
+    HashMap<String, Integer> getMpa();
 }
