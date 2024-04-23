@@ -146,7 +146,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public void validateUserExist(Integer userId) {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select USER_ID from USERS where USER_ID = ?", userId);
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet("SELECT USER_ID FROM USERS WHERE USER_ID = ?", userId);
         if (!userRows.next()) {
             log.error("User with this id {} wasn't found", userId);
             throw new UserNotFoundException(userId);
@@ -158,8 +158,7 @@ public class UserDbStorage implements UserStorage {
         validateUserExist(userId);
         validateUserExist(friendId);
 
-        jdbcTemplate.update("DELETE FROM FRIENDS WHERE FIRST_USER_ID = ?", userId);
-        jdbcTemplate.update("DELETE FROM FRIENDS WHERE FIRST_USER_ID = ?", friendId);
+        jdbcTemplate.update("DELETE FROM FRIENDS WHERE FIRST_USER_ID = ? AND  SECOND_USER_ID = ?", userId, friendId);
     }
 
     @Override
