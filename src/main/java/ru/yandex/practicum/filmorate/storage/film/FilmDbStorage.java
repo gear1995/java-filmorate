@@ -31,12 +31,13 @@ public class FilmDbStorage implements FilmStorage {
 
         List<Film> filmsList = new ArrayList<>();
         if (filmsRows.next()) {
-            HashMap<String, Integer> genresMap = getGenreIdMapByFilmId(filmsRows);
+            ArrayList<HashMap<String, Integer>> genresMap = getGenreIdMapByFilmId(filmsRows);
 
             Set<Integer> likeList = getLikesListByFilmId(filmsRows);
 
             HashMap<String, Integer> mpaMap = new HashMap<>();
             mpaMap.put("id", filmsRows.getInt("MPA_RATING_ID"));
+
             filmsList.add(new Film(
                     filmsRows.getInt("FILM_ID"),
                     filmsRows.getString("FILM_NAME"),
@@ -77,16 +78,17 @@ public class FilmDbStorage implements FilmStorage {
         return genreList;
     }
 
-    private HashMap<String, Integer> getGenreIdMapByFilmId(SqlRowSet filmsRows) {
+    private ArrayList<HashMap<String, Integer>> getGenreIdMapByFilmId(SqlRowSet filmsRows) {
         SqlRowSet genreRows = jdbcTemplate.queryForRowSet(
                 "SELECT FG.GENRE_ID FROM GENRE " +
                         "LEFT JOIN FILM_GENRE FG on GENRE.GENRE_ID = FG.GENRE_ID WHERE FILM_ID = ?",
                 filmsRows.getString("FILM_ID")
         );
-
-        HashMap<String, Integer> genreList = new HashMap<>();
+        ArrayList<HashMap<String, Integer>> genreList = new ArrayList<>();
         if (genreRows.next()) {
-            genreList.put("id", genreRows.getInt("GENRE_ID"));
+            HashMap<String, Integer> genreMap = new HashMap<>();
+            genreMap.put("id", genreRows.getInt("GENRE_ID"));
+            genreList.add(genreMap);
         }
         return genreList;
     }
@@ -94,15 +96,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film createFilm(Film film) {
         Set<Integer> filmLikes = film.getLikes();
-        HashMap<String, Integer> genresMap = film.getGenres();
-        SqlRowSet filmsRows = jdbcTemplate.queryForRowSet(
-                "SELECT MPA_RATING_NAME FROM MPA_RATING WHERE MPA_RATING_ID = ?",
-                film.getMpa());
-
-        String mpaRatingName = null;
-        if (filmsRows.next()) {
-            mpaRatingName = filmsRows.getString("MPA_RATING_NAME");
-        }
+        ArrayList<HashMap<String, Integer>> genresMapList = film.getGenres();
 
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("FILMS")
@@ -113,9 +107,8 @@ public class FilmDbStorage implements FilmStorage {
         parameters.put("DESCRIPTION", film.getDescription());
         parameters.put("RELEASE_DATE", film.getReleaseDate());
         parameters.put("DURATION", film.getDuration());
-        parameters.put("MPA_RATING_ID", mpaRatingName);
+        parameters.put("MPA_RATING_ID", film.getMpa().get("id"));
         Number filmId = simpleJdbcInsert.executeAndReturnKey(parameters);
-
 
         if (filmLikes != null) {
             filmLikes.forEach(userId ->
@@ -123,9 +116,11 @@ public class FilmDbStorage implements FilmStorage {
             );
         }
 
-        if (genresMap != null) {
-            genresMap.forEach((str, value) ->
-                    jdbcTemplate.update("INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)", filmId, value)
+        if (genresMapList != null) {
+            genresMapList.forEach(map ->
+                    jdbcTemplate.update("INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)",
+                            filmId,
+                            map.get("id"))
             );
         }
 
@@ -137,7 +132,7 @@ public class FilmDbStorage implements FilmStorage {
     public Film updateFilm(Film film) {
         validateFilmExist(film.getId());
         Set<Integer> filmLikes = film.getLikes();
-        HashMap<String, Integer> genresIdMap = film.getGenres();
+        ArrayList<HashMap<String, Integer>> genresIdMap = film.getGenres();
 
         if (filmLikes != null) {
             filmLikes.forEach(user ->
@@ -146,10 +141,10 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         if (genresIdMap != null) {
-            genresIdMap.forEach((str, genreId) ->
+            genresIdMap.forEach(map ->
                     jdbcTemplate.update("INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)",
                             film.getId(),
-                            genreId)
+                            map.get("id"))
             );
         }
 
@@ -203,7 +198,7 @@ public class FilmDbStorage implements FilmStorage {
         validateFilmExist(filmId);
         SqlRowSet filmsRows = jdbcTemplate.queryForRowSet("SELECT * FROM FILMS WRERE WHERE FILM_ID = ?", filmId);
         if (filmsRows.next()) {
-            HashMap<String, Integer> genresIdMap = getGenreIdMapByFilmId(filmsRows);
+            ArrayList<HashMap<String, Integer>> genresIdMap = getGenreIdMapByFilmId(filmsRows);
 
             Set<Integer> likeList = getLikesListByFilmId(filmsRows);
 
