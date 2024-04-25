@@ -31,15 +31,14 @@ public class FilmDbStorage implements FilmStorage {
 
         List<Film> filmsList = new ArrayList<>();
         if (filmsRows.next()) {
-            ArrayList<HashMap<String, Integer>> genresMap = getGenreIdMapByFilmId(filmsRows);
-
-            Set<Integer> likeList = getLikesListByFilmId(filmsRows);
-
+            Integer filmId = filmsRows.getInt("FILM_ID");
+            ArrayList<HashMap<String, Integer>> genresMap = getGenreIdMapByFilmId(filmId);
+            Set<Integer> likeList = getLikesListByFilmId(filmId);
             HashMap<String, Integer> mpaMap = new HashMap<>();
             mpaMap.put("id", filmsRows.getInt("MPA_RATING_ID"));
 
             filmsList.add(new Film(
-                    filmsRows.getInt("FILM_ID"),
+                    filmId,
                     filmsRows.getString("FILM_NAME"),
                     filmsRows.getString("DESCRIPTION"),
                     filmsRows.getString("RELEASE_DATE"),
@@ -52,11 +51,8 @@ public class FilmDbStorage implements FilmStorage {
         return filmsList;
     }
 
-    private Set<Integer> getLikesListByFilmId(SqlRowSet filmsRows) {
-        SqlRowSet likesRows = jdbcTemplate.queryForRowSet(
-                "SELECT * FROM FILM_LIKES WHERE FILM_ID = ?",
-                filmsRows.getString("FILM_ID")
-        );
+    private Set<Integer> getLikesListByFilmId(Integer filmId) {
+        SqlRowSet likesRows = jdbcTemplate.queryForRowSet("SELECT * FROM FILM_LIKES WHERE FILM_ID = ?", filmId);
         Set<Integer> likeList = new HashSet<>();
         if (likesRows.next()) {
             likeList.add(likesRows.getInt("USER_ID"));
@@ -78,12 +74,8 @@ public class FilmDbStorage implements FilmStorage {
         return genreList;
     }
 
-    private ArrayList<HashMap<String, Integer>> getGenreIdMapByFilmId(SqlRowSet filmsRows) {
-        SqlRowSet genreRows = jdbcTemplate.queryForRowSet(
-                "SELECT FG.GENRE_ID FROM GENRE " +
-                        "LEFT JOIN FILM_GENRE FG on GENRE.GENRE_ID = FG.GENRE_ID WHERE FILM_ID = ?",
-                filmsRows.getString("FILM_ID")
-        );
+    private ArrayList<HashMap<String, Integer>> getGenreIdMapByFilmId(Integer filmId) {
+        SqlRowSet genreRows = jdbcTemplate.queryForRowSet("SELECT GENRE_ID FROM FILM_GENRE WHERE FILM_ID = ?", filmId);
         ArrayList<HashMap<String, Integer>> genreList = new ArrayList<>();
         if (genreRows.next()) {
             HashMap<String, Integer> genreMap = new HashMap<>();
@@ -111,46 +103,41 @@ public class FilmDbStorage implements FilmStorage {
         Number filmId = simpleJdbcInsert.executeAndReturnKey(parameters);
 
         if (filmLikes != null) {
-            filmLikes.forEach(userId ->
-                    jdbcTemplate.update("INSERT INTO FILM_LIKES (FILM_ID, USER_ID) VALUES (?, ?)", filmId, userId)
-            );
+            String sqlQuery = "MERGE INTO FILM_LIKES KEY(FILM_ID, USER_ID) VALUES (?, ?)";
+            filmLikes.forEach(user -> jdbcTemplate.update(sqlQuery, film.getId(), user));
         }
 
         if (genresMapList != null) {
-            genresMapList.forEach(map ->
-                    jdbcTemplate.update("INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)",
-                            filmId,
-                            map.get("id"))
-            );
+            String sqlQuery = "MERGE INTO FILM_GENRE KEY(FILM_ID, GENRE_ID) VALUES (?, ?)";
+            genresMapList.forEach(map -> jdbcTemplate.update(sqlQuery, film.getId(), map.get("id")));
         }
 
         log.debug("Добавлен фильм: {}", film.getName());
+
         return findFilmById(filmId.intValue()).get();
     }
 
     @Override
     public Film updateFilm(Film film) {
+        Integer filmId = film.getId();
         validateFilmExist(film.getId());
         Set<Integer> filmLikes = film.getLikes();
         ArrayList<HashMap<String, Integer>> genresIdMap = film.getGenres();
 
+        jdbcTemplate.update("DELETE FROM FILM_LIKES WHERE FILM_ID = ?", filmId);
         if (filmLikes != null) {
-            filmLikes.forEach(user ->
-                    jdbcTemplate.update("INSERT INTO FILM_LIKES (FILM_ID, USER_ID) VALUES (?, ?)", film.getId(), user)
-            );
+            String sqlQuery = "MERGE INTO FILM_LIKES (FILM_ID, USER_ID) VALUES (?, ?)";
+            filmLikes.forEach(user -> jdbcTemplate.update(sqlQuery, filmId, user));
         }
-
+        jdbcTemplate.update("DELETE FROM FILM_GENRE WHERE FILM_ID = ?", filmId);
         if (genresIdMap != null) {
-            genresIdMap.forEach(map ->
-                    jdbcTemplate.update("INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)",
-                            film.getId(),
-                            map.get("id"))
-            );
+            String sqlQuery = "MERGE INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)";
+            genresIdMap.forEach(map -> jdbcTemplate.update(sqlQuery, film.getId(), map.get("id")));
         }
 
-        String sqlQuery = "update FILMS set " +
+        String sqlQuery = "UPDATE FILMS SET " +
                 "FILM_NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, MPA_RATING_ID = ?" +
-                "where FILM_ID = ?";
+                "WHERE FILM_ID = ?";
 
         jdbcTemplate.update(sqlQuery,
                 film.getName(),
@@ -190,7 +177,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Optional<Film> setLike(Integer filmId, Integer userId) {
         validateFilmExist(filmId);
-        jdbcTemplate.update("INSERT INTO FILM_LIKES (FILM_ID, USER_ID) VALUES (?, ?)", filmId, userId);
+        jdbcTemplate.update("MERGE INTO FILM_LIKES (FILM_ID, USER_ID) VALUES (?, ?)", filmId, userId);
         return findFilmById(filmId);
     }
 
@@ -198,9 +185,8 @@ public class FilmDbStorage implements FilmStorage {
         validateFilmExist(filmId);
         SqlRowSet filmsRows = jdbcTemplate.queryForRowSet("SELECT * FROM FILMS WRERE WHERE FILM_ID = ?", filmId);
         if (filmsRows.next()) {
-            ArrayList<HashMap<String, Integer>> genresIdMap = getGenreIdMapByFilmId(filmsRows);
-
-            Set<Integer> likeList = getLikesListByFilmId(filmsRows);
+            ArrayList<HashMap<String, Integer>> genresIdMap = getGenreIdMapByFilmId(filmId);
+            Set<Integer> likeList = getLikesListByFilmId(filmId);
 
             HashMap<String, Integer> mpaMap = new HashMap<>();
             mpaMap.put("id", filmsRows.getInt("MPA_RATING_ID"));

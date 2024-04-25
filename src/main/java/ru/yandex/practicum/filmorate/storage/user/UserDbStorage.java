@@ -95,7 +95,7 @@ public class UserDbStorage implements UserStorage {
 
         if (userFriends.size() > 0) {
             userFriends.forEach(friendId ->
-                    jdbcTemplate.update("INSERT INTO FRIENDS (FIRST_USER_ID, SECOND_USER_ID, FRIENDSHIP_STATUS)" +
+                    jdbcTemplate.update("MERGE INTO FRIENDS (FIRST_USER_ID, SECOND_USER_ID, FRIENDSHIP_STATUS)" +
                             " VALUES (?, ?, ?)", userId, friendId, "CONFIRMED")
             );
         }
@@ -113,7 +113,7 @@ public class UserDbStorage implements UserStorage {
 
         if (userFriends.size() > 0) {
             userFriends.forEach(friendId ->
-                    jdbcTemplate.update("INSERT INTO FRIENDS (FIRST_USER_ID, SECOND_USER_ID, FRIENDSHIP_STATUS)" +
+                    jdbcTemplate.update("MERGE INTO FRIENDS (FIRST_USER_ID, SECOND_USER_ID, FRIENDSHIP_STATUS)" +
                             " VALUES (?, ?, ?)", user.getId(), friendId, "CONFIRMED")
             );
         }
@@ -139,7 +139,7 @@ public class UserDbStorage implements UserStorage {
         validateUserExist(userId);
         validateUserExist(friendId);
 
-        jdbcTemplate.update("INSERT INTO FRIENDS (FIRST_USER_ID, SECOND_USER_ID, FRIENDSHIP_STATUS)" +
+        jdbcTemplate.update("MERGE INTO FRIENDS (FIRST_USER_ID, SECOND_USER_ID, FRIENDSHIP_STATUS)" +
                 " VALUES (?, ?, ?)", userId, friendId, "CONFIRMED");
     }
 
