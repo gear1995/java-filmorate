@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.FilmData;
 import ru.yandex.practicum.filmorate.exeption.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -43,12 +44,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public HashMap<String, Integer> getGenresList() {
+    public ArrayList<FilmData> getAllGenres() {
         return null;
     }
 
     @Override
-    public HashMap<String, Integer> getFilmGenres(Integer filmId) {
+    public ArrayList<FilmData> getGenresById(Integer genreId) {
         return null;
     }
 
@@ -73,12 +74,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public HashMap<String, Integer> getMpaById(Integer id) {
+    public FilmData getMpaById(Integer id) {
         return null;
     }
 
     @Override
-    public HashMap<String, Integer> getMpa() {
+    public ArrayList<FilmData> getMpa() {
         return null;
     }
 }

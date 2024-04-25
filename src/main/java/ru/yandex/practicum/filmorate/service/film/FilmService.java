@@ -3,10 +3,11 @@ package ru.yandex.practicum.filmorate.service.film;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.FilmData;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,19 +48,19 @@ public class FilmService {
         return filmStorage.getPopularFilms(count);
     }
 
-    public HashMap<String, Integer> getGenresList() {
-        return filmStorage.getGenresList();
+    public ArrayList<FilmData> getGenresList() {
+        return filmStorage.getAllGenres();
     }
 
-    public HashMap<String, Integer> getFilmGenres(Integer filmId) {
-        return filmStorage.getFilmGenres(filmId);
+    public ArrayList<FilmData> getGenresById(Integer filmId) {
+        return filmStorage.getGenresById(filmId);
     }
 
-    public HashMap<String, Integer> getMpaById(Integer id) {
+    public FilmData getMpaById(Integer id) {
         return filmStorage.getMpaById(id);
     }
 
-    public HashMap<String, Integer> getMpa() {
+    public ArrayList<FilmData> getMpa() {
         return filmStorage.getMpa();
     }
 }

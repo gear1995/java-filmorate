@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.FilmData;
 import ru.yandex.practicum.filmorate.exeption.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -152,24 +153,23 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public HashMap<String, Integer> getGenresList() {
-        SqlRowSet genresRows = jdbcTemplate.queryForRowSet("SELECT GENRE_ID FROM GENRE");
-        HashMap<String, Integer> genreList = new HashMap<>();
+    public ArrayList<FilmData> getAllGenres() {
+        SqlRowSet genresRows = jdbcTemplate.queryForRowSet("SELECT GENRE_ID, GENRE_NAME FROM GENRE");
+        ArrayList<FilmData> genreList = new ArrayList<>();
         if (genresRows.next()) {
-            genreList.put("id", genresRows.getInt("GENRE_ID"));
+            genreList.add(new FilmData(genresRows.getInt("GENRE_ID"), genresRows.getString("GENRE_NAME")));
         }
         return genreList;
     }
 
     @Override
-    public HashMap<String, Integer> getFilmGenres(Integer filmId) {
-        validateFilmExist(filmId);
-
-        SqlRowSet genresRows = jdbcTemplate.queryForRowSet("SELECT FG.GENRE_ID FROM GENRE " +
-                "LEFT JOIN FILM_GENRE FG ON GENRE.GENRE_ID = FG.GENRE_ID WHERE FILM_ID = ?", filmId);
-        HashMap<String, Integer> genreList = new HashMap<>();
+    public ArrayList<FilmData> getGenresById(Integer genreId) {
+        SqlRowSet genresRows = jdbcTemplate.queryForRowSet("SELECT GENRE_ID, GENRE_NAME FROM GENRE WHERE GENRE_ID = ?",
+                genreId);
+        ArrayList<FilmData> genreList = new ArrayList<>();
         if (genresRows.next()) {
-            genreList.put("id", genresRows.getInt("FG.GENRE_ID"));
+            genreList.add(new FilmData(genresRows.getInt("GENRE_ID"),
+                    genresRows.getString("GENRE_NAME")));
         }
         return genreList;
     }
@@ -225,21 +225,23 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public HashMap<String, Integer> getMpaById(Integer id) {
-        SqlRowSet mpaRows = jdbcTemplate.queryForRowSet("SELECT MPA_RATING_ID FROM MPA_RATING WHERE MPA_RATING_ID = ?", id);
-        HashMap<String, Integer> mpaMap = new HashMap<>();
+    public FilmData getMpaById(Integer mpaId) {
+        SqlRowSet mpaRows = jdbcTemplate.queryForRowSet("SELECT MPA_RATING_ID, MPA_RATING_NAME " +
+                "FROM MPA_RATING WHERE MPA_RATING_ID = ?", mpaId);
+
         if (mpaRows.next()) {
-            mpaMap.put("id", mpaRows.getInt("MPA_RATING_ID"));
+            return new FilmData(mpaRows.getInt("MPA_RATING_ID"), mpaRows.getString("MPA_RATING_NAME"));
         }
-        return mpaMap;
+        return null;
     }
 
     @Override
-    public HashMap<String, Integer> getMpa() {
-        SqlRowSet mpaRows = jdbcTemplate.queryForRowSet("SELECT MPA_RATING_ID FROM MPA_RATING");
-        HashMap<String, Integer> mpaRatingName = new HashMap<>();
+    public ArrayList<FilmData> getMpa() {
+        SqlRowSet mpaRows = jdbcTemplate.queryForRowSet("SELECT MPA_RATING_ID, MPA_RATING_NAME FROM MPA_RATING");
+        ArrayList<FilmData> mpaRatingName = new ArrayList<>();
         if (mpaRows.next()) {
-            mpaRatingName.put("id", mpaRows.getInt("MPA_RATING_ID"));
+            mpaRatingName.add(new FilmData(mpaRows.getInt("MPA_RATING_ID"),
+                    mpaRows.getString("MPA_RATING_NAME")));
         }
         return mpaRatingName;
     }

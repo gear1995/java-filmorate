@@ -88,4 +88,6 @@ MERGE INTO GENRE (GENRE_ID, GENRE_NAME)
 MERGE INTO MPA_RATING (MPA_RATING_ID, MPA_RATING_NAME)
     VALUES (1, 'PG-13'),
            (2, 'PG-17'),
-           (3, 'PG-21');
+           (3, 'PG-21'),
+           (4, 'PG-22'),
+           (5, 'PG-23');
