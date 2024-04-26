@@ -1,10 +1,10 @@
 create table IF NOT EXISTS USERS
 (
-    USER_ID  INTEGER AUTO_INCREMENT not null,
-    EMAIL    CHARACTER VARYING(100) not null UNIQUE,
+    USER_ID  INTEGER AUTO_INCREMENT NOT NULL,
+    EMAIL    CHARACTER VARYING(100) NOT NULL UNIQUE,
     NAME     CHARACTER VARYING(50),
-    BIRTHDAY DATE                   not null,
-    LOGIN    CHARACTER VARYING(50)  not null unique,
+    BIRTHDAY DATE                   NOT NULL,
+    LOGIN    CHARACTER VARYING(50)  NOT NULL unique,
     constraint USERS_PK
         primary key (USER_ID)
 );
@@ -12,7 +12,7 @@ create table IF NOT EXISTS USERS
 create table IF NOT EXISTS MPA_RATING
 (
     MPA_RATING_ID   INTEGER               NOT NULL AUTO_INCREMENT,
-    MPA_RATING_NAME CHARACTER VARYING(10) not null UNIQUE,
+    MPA_RATING_NAME CHARACTER VARYING(10) NOT NULL UNIQUE,
     constraint MPA_RATING_PK
         primary key (MPA_RATING_ID)
 );
@@ -21,9 +21,9 @@ create table IF NOT EXISTS MPA_RATING
 create table IF NOT EXISTS FILMS
 (
     FILM_ID       INTEGER AUTO_INCREMENT NOT NULL,
-    FILM_NAME     CHARACTER VARYING(100) not null,
+    FILM_NAME     CHARACTER VARYING(100) NOT NULL,
     DESCRIPTION   CHARACTER VARYING(200),
-    RELEASE_DATE  DATE                   not null,
+    RELEASE_DATE  DATE                   NOT NULL,
     DURATION      INTEGER,
     MPA_RATING_ID INTEGER,
     constraint FILMS_PK
@@ -34,8 +34,8 @@ create table IF NOT EXISTS FILMS
 
 create table IF NOT EXISTS FILM_LIKES
 (
-    FILM_ID INTEGER not null,
-    USER_ID INTEGER not null,
+    FILM_ID INTEGER NOT NULL,
+    USER_ID INTEGER NOT NULL,
     constraint FILM_LIKES_PK
         primary key (FILM_ID, USER_ID),
     constraint FILM_LIKES_FILMS_FILM_ID_FK
@@ -46,9 +46,9 @@ create table IF NOT EXISTS FILM_LIKES
 
 create table IF NOT EXISTS FRIENDS
 (
-    FIRST_USER_ID     INTEGER               not null,
-    SECOND_USER_ID    INTEGER               not null,
-    FRIENDSHIP_STATUS CHARACTER VARYING(50) not null,
+    FIRST_USER_ID     INTEGER               NOT NULL,
+    SECOND_USER_ID    INTEGER               NOT NULL,
+    FRIENDSHIP_STATUS CHARACTER VARYING(50) NOT NULL,
     constraint FRIENDS_PK
         primary key (FIRST_USER_ID, SECOND_USER_ID),
     constraint FRIENDS_USERS_USER_ID_FK
@@ -59,7 +59,7 @@ create table IF NOT EXISTS FRIENDS
 
 create table IF NOT EXISTS GENRE
 (
-    GENRE_ID   INTEGER AUTO_INCREMENT not null,
+    GENRE_ID   INTEGER AUTO_INCREMENT NOT NULL,
     GENRE_NAME CHARACTER VARYING(100) UNIQUE,
     constraint GENRE_PK
         primary key (GENRE_ID)
@@ -67,8 +67,8 @@ create table IF NOT EXISTS GENRE
 
 create table IF NOT EXISTS FILM_GENRE
 (
-    FILM_ID  INTEGER not null,
-    GENRE_ID INTEGER not null,
+    FILM_ID  INTEGER NOT NULL,
+    GENRE_ID INTEGER NOT NULL,
     constraint FILM_GENRE_PK
         primary key (FILM_ID, GENRE_ID),
     constraint FILM_GENRE_FILMS_FILM_ID_FK
