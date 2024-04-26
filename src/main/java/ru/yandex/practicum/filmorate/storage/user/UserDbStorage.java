@@ -69,7 +69,7 @@ public class UserDbStorage implements UserStorage {
                     " FROM FRIENDS WHERE FIRST_USER_ID = ?", userRows.getString("USER_ID"));
 
             Set<Integer> friendsSet = new HashSet<>();
-            if (friendsRows.next()) {
+            while (friendsRows.next()) {
                 friendsSet.add(friendsRows.getInt("SECOND_USER_ID"));
             }
 

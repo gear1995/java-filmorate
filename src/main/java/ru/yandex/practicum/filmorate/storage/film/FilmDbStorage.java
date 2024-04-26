@@ -110,32 +110,36 @@ public class FilmDbStorage implements FilmStorage {
         validateFilmExist(film.getId());
         Set<Integer> filmLikes = film.getLikes();
         ArrayList<HashMap<String, Integer>> genresIdMap = film.getGenres();
-
         jdbcTemplate.update("DELETE FROM FILM_LIKES WHERE FILM_ID = ?", filmId);
-        if (filmLikes != null) {
-            String sqlQuery = "MERGE INTO FILM_LIKES (FILM_ID, USER_ID) VALUES (?, ?)";
-            filmLikes.forEach(user -> jdbcTemplate.update(sqlQuery, filmId, user));
-        }
         jdbcTemplate.update("DELETE FROM FILM_GENRE WHERE FILM_ID = ?", filmId);
-        if (genresIdMap != null) {
-            String sqlQuery = "MERGE INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)";
-            genresIdMap.forEach(map -> jdbcTemplate.update(sqlQuery, film.getId(), map.get("id")));
+        deleteFilmById(filmId);
+
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("FILMS");
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("FILM_ID", filmId);
+        parameters.put("FILM_NAME", film.getName());
+        parameters.put("DESCRIPTION", film.getDescription());
+        parameters.put("RELEASE_DATE", film.getReleaseDate());
+        parameters.put("DURATION", film.getDuration());
+        parameters.put("MPA_RATING_ID", film.getMpa().get("id"));
+        simpleJdbcInsert.execute(parameters);
+
+        if (filmLikes != null) {
+            String addLikesQuery = "MERGE INTO FILM_LIKES (FILM_ID, USER_ID) VALUES (?, ?)";
+            filmLikes.forEach(user -> jdbcTemplate.update(addLikesQuery, filmId, user));
         }
-
-        String sqlQuery = "UPDATE FILMS SET " +
-                "FILM_NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, MPA_RATING_ID = ?" +
-                "WHERE FILM_ID = ?";
-
-        jdbcTemplate.update(sqlQuery,
-                film.getName(),
-                film.getDescription(),
-                film.getReleaseDate(),
-                film.getDuration(),
-                film.getMpa(),
-                film.getId());
+        if (genresIdMap != null) {
+            String addGenresQuery = "MERGE INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)";
+            genresIdMap.forEach(map -> jdbcTemplate.update(addGenresQuery, filmId, map.get("id")));
+        }
 
         log.debug("Обновлен фильм: {}", film.getName());
         return findFilmById(film.getId()).get();
+    }
+
+    private void deleteFilmById(Integer filmId) {
+        jdbcTemplate.update("DELETE FROM FILMS WHERE FILM_ID =?", filmId);
     }
 
     @Override
