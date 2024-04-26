@@ -31,7 +31,7 @@ public class FilmDbStorage implements FilmStorage {
         );
 
         List<Film> filmsList = new ArrayList<>();
-        if (filmsRows.next()) {
+        while (filmsRows.next()) {
             Integer filmId = filmsRows.getInt("FILM_ID");
             ArrayList<HashMap<String, Integer>> genresList = getGenreIdMapByFilmId(filmId);
             Set<Integer> likeList = getLikesListByFilmId(filmId);
@@ -55,7 +55,7 @@ public class FilmDbStorage implements FilmStorage {
     private Set<Integer> getLikesListByFilmId(Integer filmId) {
         SqlRowSet likesRows = jdbcTemplate.queryForRowSet("SELECT * FROM FILM_LIKES WHERE FILM_ID = ?", filmId);
         Set<Integer> likeList = new HashSet<>();
-        if (likesRows.next()) {
+        while (likesRows.next()) {
             likeList.add(likesRows.getInt("USER_ID"));
         }
         return likeList;
@@ -64,7 +64,7 @@ public class FilmDbStorage implements FilmStorage {
     private ArrayList<HashMap<String, Integer>> getGenreIdMapByFilmId(Integer filmId) {
         SqlRowSet genreRows = jdbcTemplate.queryForRowSet("SELECT GENRE_ID FROM FILM_GENRE WHERE FILM_ID = ?", filmId);
         ArrayList<HashMap<String, Integer>> genreList = new ArrayList<>();
-        if (genreRows.next()) {
+        while (genreRows.next()) {
             HashMap<String, Integer> idMap = new HashMap<>();
             idMap.put("id", genreRows.getInt("GENRE_ID"));
             genreList.add(idMap);
@@ -142,7 +142,7 @@ public class FilmDbStorage implements FilmStorage {
     public ArrayList<FilmData> getAllGenres() {
         SqlRowSet genresRows = jdbcTemplate.queryForRowSet("SELECT GENRE_ID, GENRE_NAME FROM GENRE");
         ArrayList<FilmData> genreList = new ArrayList<>();
-        if (genresRows.next()) {
+        while (genresRows.next()) {
             genreList.add(new FilmData(genresRows.getInt("GENRE_ID"), genresRows.getString("GENRE_NAME")));
         }
         return genreList;
@@ -153,7 +153,7 @@ public class FilmDbStorage implements FilmStorage {
         SqlRowSet genresRows = jdbcTemplate.queryForRowSet("SELECT GENRE_ID, GENRE_NAME FROM GENRE WHERE GENRE_ID = ?",
                 genreId);
         ArrayList<FilmData> genreList = new ArrayList<>();
-        if (genresRows.next()) {
+        while (genresRows.next()) {
             genreList.add(new FilmData(genresRows.getInt("GENRE_ID"),
                     genresRows.getString("GENRE_NAME")));
         }

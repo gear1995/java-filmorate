@@ -28,7 +28,7 @@ public class UserDbStorage implements UserStorage {
                 " FROM FRIENDS WHERE FIRST_USER_ID = ?", id);
 
         Set<Integer> friendsSet = new HashSet<>();
-        if (friendsRows.next()) {
+        while (friendsRows.next()) {
             friendsSet.add(friendsRows.getInt("SECOND_USER_ID"));
         }
         User user = null;
@@ -63,7 +63,7 @@ public class UserDbStorage implements UserStorage {
         SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from USERS");
         List<User> usersList = new ArrayList<>();
 
-        if (userRows.next()) {
+        while (userRows.next()) {
             SqlRowSet friendsRows = jdbcTemplate.queryForRowSet("SELECT SECOND_USER_ID" +
                     " FROM FRIENDS WHERE FIRST_USER_ID = ?", userRows.getString("USER_ID"));
 
@@ -166,7 +166,7 @@ public class UserDbStorage implements UserStorage {
         SqlRowSet userRows = jdbcTemplate.queryForRowSet("SELECT SECOND_USER_ID FROM FRIENDS WHERE FIRST_USER_ID = ?",
                 userId);
         List<User> userList = new ArrayList<>();
-        if (userRows.next()) {
+        while (userRows.next()) {
             userList.add(findUserById(userRows.getInt("SECOND_USER_ID")));
         }
         return userList;
