@@ -91,12 +91,12 @@ public class FilmDbStorage implements FilmStorage {
 
         if (filmLikes != null) {
             String sqlQuery = "MERGE INTO FILM_LIKES (FILM_ID, USER_ID) VALUES (?, ?)";
-            filmLikes.forEach(user -> jdbcTemplate.update(sqlQuery, film.getId(), user));
+            filmLikes.forEach(user -> jdbcTemplate.update(sqlQuery, filmId, user));
         }
 
         if (genresList != null) {
-            String sqlQuery = "MERGE INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)";
-            genresList.forEach(map -> jdbcTemplate.update(sqlQuery, film.getId(), map.get("id")));
+            String sqlQuery = "MERGE INTO FILM_GENRE KEY (FILM_ID, GENRE_ID) VALUES (?, ?)";
+            genresList.forEach(map -> jdbcTemplate.update(sqlQuery, filmId, map.get("id")));
         }
 
         log.debug("Добавлен фильм: {}", film.getName());
@@ -225,7 +225,7 @@ public class FilmDbStorage implements FilmStorage {
     public ArrayList<FilmData> getMpa() {
         SqlRowSet mpaRows = jdbcTemplate.queryForRowSet("SELECT MPA_RATING_ID, MPA_RATING_NAME FROM MPA_RATING");
         ArrayList<FilmData> mpaRatingName = new ArrayList<>();
-        if (mpaRows.next()) {
+        while (mpaRows.next()) {
             mpaRatingName.add(new FilmData(mpaRows.getInt("MPA_RATING_ID"),
                     mpaRows.getString("MPA_RATING_NAME")));
         }
