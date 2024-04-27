@@ -10,7 +10,6 @@ import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Set;
 
 /**
@@ -19,6 +18,7 @@ import java.util.Set;
 @Data
 @Slf4j
 public class Film {
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private Integer id = 1;
     @NotBlank
     private String name;
@@ -31,8 +31,6 @@ public class Film {
     private Set<Integer> likes;
     private ArrayList<FilmData> genres;
     private FilmData mpa;
-
-    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public Film(Integer id,
                 @NotBlank String name,

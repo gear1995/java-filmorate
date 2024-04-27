@@ -15,6 +15,7 @@ import java.util.Set;
 @Data
 @Slf4j
 public class User {
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private int id;
     @Email
     private String email;
@@ -24,8 +25,6 @@ public class User {
     @NotBlank
     private String birthday;
     private Set<Integer> friends = new HashSet<>();
-
-    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public User(@Email String email,
                 @NotBlank String login,

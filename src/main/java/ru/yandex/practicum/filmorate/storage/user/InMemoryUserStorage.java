@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class InMemoryUserStorage implements UserStorage {
-    private final HashMap<Integer, User> users = new HashMap<>();
     private static int ID = 1;
+    private final HashMap<Integer, User> users = new HashMap<>();
 
     @Override
     public List<User> findAllUsers() {
