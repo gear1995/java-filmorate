@@ -101,7 +101,7 @@ public class FilmDbStorage implements FilmStorage {
 
         log.debug("Добавлен фильм: {}", film.getName());
 
-        return findFilmById(filmId.intValue()).get();
+        return this.getFilmById(filmId.intValue()).get();
     }
 
     @Override
@@ -135,7 +135,7 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         log.debug("Обновлен фильм: {}", film.getName());
-        return findFilmById(film.getId()).get();
+        return this.getFilmById(film.getId()).get();
     }
 
     private void deleteFilmById(Integer filmId) {
@@ -168,10 +168,11 @@ public class FilmDbStorage implements FilmStorage {
     public Optional<Film> setLike(Integer filmId, Integer userId) {
         validateFilmExist(filmId);
         jdbcTemplate.update("MERGE INTO FILM_LIKES (FILM_ID, USER_ID) VALUES (?, ?)", filmId, userId);
-        return findFilmById(filmId);
+        return this.getFilmById(filmId);
     }
 
-    public Optional<Film> findFilmById(Integer filmId) {
+    @Override
+    public Optional<Film> getFilmById(Integer filmId) {
         validateFilmExist(filmId);
         SqlRowSet filmsRows = jdbcTemplate.queryForRowSet("SELECT * FROM FILMS WRERE WHERE FILM_ID = ?", filmId);
         if (filmsRows.next()) {
@@ -199,7 +200,7 @@ public class FilmDbStorage implements FilmStorage {
     public Optional<Film> deleteLike(Integer filmId, Integer userId) {
         validateFilmExist(filmId);
         jdbcTemplate.update("DELETE FROM FILM_LIKES WHERE USER_ID = ?", userId);
-        return findFilmById(filmId);
+        return this.getFilmById(filmId);
     }
 
     @Override

@@ -20,7 +20,7 @@ public interface FilmStorage {
 
     Optional<Film> setLike(Integer filmId, Integer userId);
 
-    Optional<Film> findFilmById(Integer filmId);
+    Optional<Film> getFilmById(Integer filmId);
 
     Optional<Film> deleteLike(Integer filmId, Integer userId);
 

@@ -62,6 +62,11 @@ public class FilmController {
         return filmService.getGenresById(id);
     }
 
+    @GetMapping(value = "{id}")
+    public Optional<Film> getFilmById(@PathVariable Integer id) {
+        return filmService.getFilmById(id);
+    }
+
     @GetMapping(value = "mpa/{id}")
     public FilmData getMpaById(@PathVariable Integer id) {
         return filmService.getMpaById(id);

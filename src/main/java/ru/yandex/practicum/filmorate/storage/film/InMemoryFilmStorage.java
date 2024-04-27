@@ -59,7 +59,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Film> findFilmById(Integer filmId) {
+    public Optional<Film> getFilmById(Integer filmId) {
         return Optional.empty();
     }
 

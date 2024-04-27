@@ -3,8 +3,8 @@ package ru.yandex.practicum.filmorate.service.film;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.model.FilmData;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmData;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class FilmService {
     }
 
     private Optional<Film> findFilmById(Integer filmId) {
-        return filmStorage.findFilmById(filmId);
+        return filmStorage.getFilmById(filmId);
     }
 
     public List<Film> getPopularFilms(Integer count) {
@@ -62,5 +62,9 @@ public class FilmService {
 
     public ArrayList<FilmData> getMpa() {
         return filmStorage.getMpa();
+    }
+
+    public Optional<Film> getFilmById(Integer filmId) {
+        return filmStorage.getFilmById(filmId);
     }
 }
