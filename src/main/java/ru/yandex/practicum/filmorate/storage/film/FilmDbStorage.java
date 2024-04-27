@@ -146,7 +146,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public ArrayList<FilmData> getAllGenres() {
-        SqlRowSet genresRows = jdbcTemplate.queryForRowSet("SELECT GENRE_ID, GENRE_NAME FROM GENRE");
+        SqlRowSet genresRows = jdbcTemplate.queryForRowSet("SELECT GENRE_ID, GENRE_NAME FROM GENRE ORDER BY GENRE_ID");
         ArrayList<FilmData> genreList = new ArrayList<>();
         while (genresRows.next()) {
             genreList.add(new FilmData(genresRows.getInt("GENRE_ID"), genresRows.getString("GENRE_NAME")));
@@ -230,7 +230,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public ArrayList<FilmData> getMpa() {
-        SqlRowSet mpaRows = jdbcTemplate.queryForRowSet("SELECT MPA_RATING_ID, MPA_RATING_NAME FROM MPA_RATING");
+        SqlRowSet mpaRows = jdbcTemplate.queryForRowSet("SELECT MPA_RATING_ID, MPA_RATING_NAME " +
+                "FROM MPA_RATING ORDER BY MPA_RATING_ID");
         ArrayList<FilmData> mpaList = new ArrayList<>();
         while (mpaRows.next()) {
             mpaList.add(new FilmData(mpaRows.getInt("MPA_RATING_ID"),
