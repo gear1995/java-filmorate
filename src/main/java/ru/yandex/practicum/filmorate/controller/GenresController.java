@@ -19,7 +19,7 @@ public class GenresController {
     }
 
     @GetMapping("{id}")
-    public ArrayList<FilmData> getGenresById(@PathVariable Integer id) {
+    public FilmData getGenresById(@PathVariable Integer id) {
         return filmService.getGenresById(id);
     }
 

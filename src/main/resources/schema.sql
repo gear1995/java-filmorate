@@ -76,18 +76,3 @@ create table IF NOT EXISTS FILM_GENRE
     constraint FILM_GENRE_GENRE_GENRE_ID_FK
         foreign key (GENRE_ID) references GENRE (GENRE_ID)
 );
-
-MERGE INTO GENRE (GENRE_ID, GENRE_NAME)
-    VALUES (1, 'HORROR'),
-           (2, 'DETECTIVE'),
-           (3, 'CASUAL'),
-           (4, 'CASUAL1'),
-           (5, 'CASUAL2'),
-           (6, 'CASUAL3');
-
-MERGE INTO MPA_RATING (MPA_RATING_ID, MPA_RATING_NAME)
-    VALUES (1, 'PG-13'),
-           (2, 'PG-17'),
-           (3, 'PG-21'),
-           (4, 'PG-22'),
-           (5, 'PG-23');

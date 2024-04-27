@@ -16,7 +16,7 @@ public interface FilmStorage {
 
     ArrayList<FilmData> getAllGenres();
 
-    ArrayList<FilmData> getGenresById(Integer genreId);
+    FilmData getGenresById(Integer genreId);
 
     Optional<Film> setLike(Integer filmId, Integer userId);
 

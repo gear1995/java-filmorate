@@ -6,6 +6,8 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exeption.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exeption.GenreNotFoundException;
+import ru.yandex.practicum.filmorate.exeption.MpaNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.FilmData;
 
@@ -101,7 +103,6 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         log.debug("Добавлен фильм: {}", film.getName());
-
         return this.getFilmById(filmId.intValue()).get();
     }
 
@@ -154,15 +155,14 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public ArrayList<FilmData> getGenresById(Integer genreId) {
+    public FilmData getGenresById(Integer genreId) {
         SqlRowSet genresRows = jdbcTemplate.queryForRowSet("SELECT GENRE_ID, GENRE_NAME FROM GENRE WHERE GENRE_ID = ?",
                 genreId);
-        ArrayList<FilmData> genreList = new ArrayList<>();
-        while (genresRows.next()) {
-            genreList.add(new FilmData(genresRows.getInt("GENRE_ID"),
-                    genresRows.getString("GENRE_NAME")));
+        if (genresRows.next()) {
+            return new FilmData(genresRows.getInt("GENRE_ID"), genresRows.getString("GENRE_NAME"));
         }
-        return genreList;
+        log.error("Genre with this id {} wasn't found", genreId);
+        throw new GenreNotFoundException(genreId);
     }
 
     @Override
@@ -221,9 +221,11 @@ public class FilmDbStorage implements FilmStorage {
                 "FROM MPA_RATING WHERE MPA_RATING_ID = ?", mpaId);
 
         if (mpaRows.next()) {
-            return new FilmData(mpaRows.getInt("MPA_RATING_ID"), mpaRows.getString("MPA_RATING_NAME"));
+            return new FilmData(mpaRows.getInt("MPA_RATING_ID"),
+                    mpaRows.getString("MPA_RATING_NAME"));
         }
-        return null;
+        log.error("MPA with this id {} wasn't found", mpaId);
+        throw new MpaNotFoundException(mpaId);
     }
 
     @Override

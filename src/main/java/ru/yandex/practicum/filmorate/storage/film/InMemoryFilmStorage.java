@@ -49,7 +49,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public ArrayList<FilmData> getGenresById(Integer genreId) {
+    public FilmData getGenresById(Integer genreId) {
         return null;
     }
 

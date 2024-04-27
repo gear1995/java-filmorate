@@ -52,7 +52,7 @@ public class FilmService {
         return filmStorage.getAllGenres();
     }
 
-    public ArrayList<FilmData> getGenresById(Integer filmId) {
+    public FilmData getGenresById(Integer filmId) {
         return filmStorage.getGenresById(filmId);
     }
 
