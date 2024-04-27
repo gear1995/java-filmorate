@@ -29,8 +29,8 @@ public class Film {
     @Positive
     private int duration;
     private Set<Integer> likes;
-    private ArrayList<HashMap<String, Integer>> genres;
-    private HashMap<String, Integer> mpa;
+    private ArrayList<FilmData> genres;
+    private FilmData mpa;
 
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -39,9 +39,9 @@ public class Film {
                 @Size(max = 200) String description,
                 @NotBlank String releaseDate,
                 @Positive int duration,
-                ArrayList<HashMap<String, Integer>> genreList,
+                ArrayList<FilmData> genreList,
                 Set<Integer> likes,
-                HashMap<String, Integer> mpaRating) {
+                FilmData mpaRating) {
         if (id != null) {
             this.id = id;
         }

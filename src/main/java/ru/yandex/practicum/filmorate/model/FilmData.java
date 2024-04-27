@@ -1,9 +1,23 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Data;
-
-@Data
 public class FilmData {
     private final Integer id;
-    private final String name;
+    private String name;
+
+    public FilmData(Integer id) {
+        this.id = id;
+    }
+
+    public FilmData(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
 }
