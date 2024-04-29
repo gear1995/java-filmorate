@@ -23,14 +23,14 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User findUserById(Integer id) {
         validateUserExist(id);
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from USERS where USER_ID = ?", id);
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet("SELECT * FROM users WHERE user_id = ?", id);
 
-        SqlRowSet friendsRows = jdbcTemplate.queryForRowSet("SELECT SECOND_USER_ID" +
-                " FROM FRIENDS WHERE FIRST_USER_ID = ?", id);
+        SqlRowSet friendsRows = jdbcTemplate.queryForRowSet("SELECT second_user_id" +
+                " FROM friends WHERE first_user_id = ?", id);
 
         Set<Integer> friendsSet = new HashSet<>();
         while (friendsRows.next()) {
-            friendsSet.add(friendsRows.getInt("SECOND_USER_ID"));
+            friendsSet.add(friendsRows.getInt("second_user_id"));
         }
         User user = null;
         if (userRows.next()) {
@@ -42,35 +42,18 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
-    private User buildUser(SqlRowSet userRows, Set<Integer> friendsSet) {
-        return new User(
-                Objects.requireNonNull(userRows.getString("EMAIL") != null
-                        ? userRows.getString("EMAIL")
-                        : null),
-                Objects.requireNonNull(userRows.getString("LOGIN") != null
-                        ? userRows.getString("LOGIN")
-                        : null),
-                Objects.requireNonNull(userRows.getString("BIRTHDAY") != null
-                        ? userRows.getString("BIRTHDAY")
-                        : null),
-                userRows.getString("NAME"),
-                userRows.getInt("USER_ID"),
-                friendsSet
-        );
-    }
-
     @Override
     public List<User> findAllUsers() {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from USERS");
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from users");
         List<User> usersList = new ArrayList<>();
 
         while (userRows.next()) {
-            SqlRowSet friendsRows = jdbcTemplate.queryForRowSet("SELECT SECOND_USER_ID" +
-                    " FROM FRIENDS WHERE FIRST_USER_ID = ?", userRows.getString("USER_ID"));
+            SqlRowSet friendsRows = jdbcTemplate.queryForRowSet("SELECT second_user_id" +
+                    " FROM friends WHERE first_user_id = ?", userRows.getString("user_id"));
 
             Set<Integer> friendsSet = new HashSet<>();
             while (friendsRows.next()) {
-                friendsSet.add(friendsRows.getInt("SECOND_USER_ID"));
+                friendsSet.add(friendsRows.getInt("second_user_id"));
             }
 
             usersList.add(buildUser(userRows, friendsSet));
@@ -83,20 +66,20 @@ public class UserDbStorage implements UserStorage {
         Set<Integer> userFriends = user.getFriends();
 
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("USERS")
-                .usingGeneratedKeyColumns("USER_ID");
+                .withTableName("users")
+                .usingGeneratedKeyColumns("user_id");
 
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("EMAIL", user.getEmail());
-        parameters.put("NAME", user.getName());
-        parameters.put("BIRTHDAY", user.getBirthday());
-        parameters.put("LOGIN", user.getLogin());
+        parameters.put("email", user.getEmail());
+        parameters.put("name", user.getName());
+        parameters.put("birthday", user.getBirthday());
+        parameters.put("login", user.getLogin());
 
         Number userId = simpleJdbcInsert.executeAndReturnKey(parameters);
 
         if (userFriends.size() > 0) {
             userFriends.forEach(friendId ->
-                    jdbcTemplate.update("MERGE INTO FRIENDS (FIRST_USER_ID, SECOND_USER_ID, FRIENDSHIP_STATUS)" +
+                    jdbcTemplate.update("MERGE INTO friends (first_user_id, second_user_id, friendship_status)" +
                             " VALUES (?, ?, ?)", userId, friendId, "CONFIRMED")
             );
         }
@@ -114,12 +97,12 @@ public class UserDbStorage implements UserStorage {
 
         if (userFriends.size() > 0) {
             userFriends.forEach(friendId ->
-                    jdbcTemplate.update("MERGE INTO FRIENDS (FIRST_USER_ID, SECOND_USER_ID, FRIENDSHIP_STATUS)" +
+                    jdbcTemplate.update("MERGE INTO friends (first_user_id, second_user_id, FRIENDSHIP_STATUS)" +
                             " VALUES (?, ?, ?)", user.getId(), friendId, "CONFIRMED")
             );
         }
 
-        String sqlQuery = "UPDATE USERS SET EMAIL = ?, NAME = ?, BIRTHDAY = ?, LOGIN = ? WHERE USER_ID = ?";
+        String sqlQuery = "UPDATE users SET email = ?, name = ?, birthday = ?, login = ? WHERE user_id = ?";
 
         jdbcTemplate.update(sqlQuery,
                 user.getEmail(),
@@ -134,19 +117,18 @@ public class UserDbStorage implements UserStorage {
         return findUserById(user.getId());
     }
 
-
     @Override
     public void addFriend(Integer userId, Integer friendId) {
         validateUserExist(userId);
         validateUserExist(friendId);
 
-        jdbcTemplate.update("MERGE INTO FRIENDS (FIRST_USER_ID, SECOND_USER_ID, FRIENDSHIP_STATUS)" +
+        jdbcTemplate.update("MERGE INTO friends (first_user_id, second_user_id, FRIENDSHIP_STATUS)" +
                 " VALUES (?, ?, ?)", userId, friendId, "CONFIRMED");
     }
 
     @Override
     public void validateUserExist(Integer userId) {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("SELECT USER_ID FROM USERS WHERE USER_ID = ?", userId);
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet("SELECT user_id FROM users WHERE user_id = ?", userId);
         if (!userRows.next()) {
             log.error("User with this id {} wasn't found", userId);
             throw new UserNotFoundException(userId);
@@ -158,17 +140,17 @@ public class UserDbStorage implements UserStorage {
         validateUserExist(userId);
         validateUserExist(friendId);
 
-        jdbcTemplate.update("DELETE FROM FRIENDS WHERE FIRST_USER_ID = ? AND  SECOND_USER_ID = ?", userId, friendId);
+        jdbcTemplate.update("DELETE FROM friends WHERE first_user_id = ? AND  second_user_id = ?", userId, friendId);
     }
 
     @Override
     public List<User> getFriends(Integer userId) {
         validateUserExist(userId);
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("SELECT SECOND_USER_ID FROM FRIENDS WHERE FIRST_USER_ID = ?",
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet("SELECT second_user_id FROM friends WHERE first_user_id = ?",
                 userId);
         List<User> userList = new ArrayList<>();
         while (userRows.next()) {
-            userList.add(findUserById(userRows.getInt("SECOND_USER_ID")));
+            userList.add(findUserById(userRows.getInt("second_user_id")));
         }
         return userList;
     }
@@ -178,5 +160,22 @@ public class UserDbStorage implements UserStorage {
         List<User> userFriends = getFriends(userId);
         List<User> otherUserFriends = getFriends(otherUserId);
         return userFriends.stream().filter(otherUserFriends::contains).collect(Collectors.toList());
+    }
+
+    private User buildUser(SqlRowSet userRows, Set<Integer> friendsSet) {
+        return new User(
+                Objects.requireNonNull(userRows.getString("email") != null
+                        ? userRows.getString("email")
+                        : null),
+                Objects.requireNonNull(userRows.getString("login") != null
+                        ? userRows.getString("login")
+                        : null),
+                Objects.requireNonNull(userRows.getString("birthday") != null
+                        ? userRows.getString("birthday")
+                        : null),
+                userRows.getString("name"),
+                userRows.getInt("user_id"),
+                friendsSet
+        );
     }
 }
