@@ -1,78 +1,70 @@
 package ru.yandex.practicum.filmorate.service.film;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exeption.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exeption.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.model.FilmData;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class FilmService {
-    private final InMemoryFilmStorage inMemoryFilmStorage;
-    private final InMemoryUserStorage inMemoryUserStorage;
+    private final FilmStorage filmStorage;
 
-    public Film setLike(Integer filmId, Integer userId) {
-        Film returnedFilm = findFilmById(filmId);
-
-        isUserExist(userId);
-
-        returnedFilm.setLike(userId);
-        return returnedFilm;
+    @Autowired
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage) {
+        this.filmStorage = filmStorage;
     }
 
-    public FilmService(InMemoryFilmStorage inMemoryFilmStorage, InMemoryUserStorage inMemoryUserStorage) {
-        this.inMemoryFilmStorage = inMemoryFilmStorage;
-        this.inMemoryUserStorage = inMemoryUserStorage;
+    public Optional<Film> setLike(Integer filmId, Integer userId) {
+        return filmStorage.setLike(filmId, userId);
     }
 
     public List<Film> findAllFilms() {
-        return inMemoryFilmStorage.findAllFilms();
+        return filmStorage.findAllFilms();
     }
 
     public Film createFilm(Film film) {
-        return inMemoryFilmStorage.createFilm(film);
+        return filmStorage.createFilm(film);
     }
 
     public Film updateFilm(Film film) {
-        return inMemoryFilmStorage.updateFilm(film);
+        return filmStorage.updateFilm(film);
     }
 
-    public Film deleteLike(Integer filmId, Integer userId) {
-        Film returnedFilm = findFilmById(filmId);
-
-        isUserExist(userId);
-
-        returnedFilm.deleteLike(userId);
-        return returnedFilm;
+    public Optional<Film> deleteLike(Integer filmId, Integer userId) {
+        return filmStorage.deleteLike(filmId, userId);
     }
 
-    private void isUserExist(Integer userId) {
-        inMemoryUserStorage.findAllUsers().stream()
-                .filter(user -> user.getId() == userId)
-                .findFirst()
-                .orElseThrow(() -> new UserNotFoundException(userId));
-    }
-
-    private Film findFilmById(Integer filmId) {
-        return inMemoryFilmStorage.findAllFilms().stream()
-                .filter(film -> film.getId().equals(filmId))
-                .findFirst()
-                .orElseThrow(() -> new FilmNotFoundException(filmId));
+    private Optional<Film> findFilmById(Integer filmId) {
+        return filmStorage.getFilmById(filmId);
     }
 
     public List<Film> getPopularFilms(Integer count) {
-        int currentFilmCount = 3;
-        if (count != null) {
-            currentFilmCount = count;
-        }
-        return inMemoryFilmStorage.findAllFilms().stream()
-                .sorted(Comparator.comparingInt((Film film) -> film.getLikes().size()).reversed())
-                .limit(currentFilmCount)
-                .collect(Collectors.toList());
+        return filmStorage.getPopularFilms(count);
+    }
+
+    public ArrayList<FilmData> getGenresList() {
+        return filmStorage.getAllGenres();
+    }
+
+    public FilmData getGenresById(Integer filmId) {
+        return filmStorage.getGenresById(filmId);
+    }
+
+    public FilmData getMpaById(Integer id) {
+        return filmStorage.getMpaById(id);
+    }
+
+    public ArrayList<FilmData> getMpa() {
+        return filmStorage.getMpa();
+    }
+
+    public Optional<Film> getFilmById(Integer filmId) {
+        return filmStorage.getFilmById(filmId);
     }
 }

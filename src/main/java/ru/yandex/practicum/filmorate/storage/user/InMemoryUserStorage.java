@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class InMemoryUserStorage implements UserStorage {
-    private final HashMap<Integer, User> users = new HashMap<>();
     private static int ID = 1;
+    private final HashMap<Integer, User> users = new HashMap<>();
 
     @Override
     public List<User> findAllUsers() {
@@ -78,7 +78,11 @@ public class InMemoryUserStorage implements UserStorage {
         validateUserExist(otherId);
         return users.get(id).getFriends().stream()
                 .filter(friendId -> users.get(otherId).getFriends().contains(friendId))
-                .map(users::get)
-                .collect(Collectors.toList());
+                .map(users::get).collect(Collectors.toList());
+    }
+
+    @Override
+    public User findUserById(Integer id) {
+        return null;
     }
 }

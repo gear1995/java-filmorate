@@ -9,7 +9,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Set;
 
 /**
@@ -18,6 +18,7 @@ import java.util.Set;
 @Data
 @Slf4j
 public class Film {
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private Integer id = 1;
     @NotBlank
     private String name;
@@ -27,32 +28,34 @@ public class Film {
     private String releaseDate;
     @Positive
     private int duration;
-    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private Set<Integer> likes = new HashSet<>();
+    private Set<Integer> likes;
+    private ArrayList<FilmData> genres;
+    private FilmData mpa;
 
-    public Film(@NotBlank String name, @Size(max = 200) String description, @NotBlank String releaseDate, @Positive int duration, Integer id) {
-        validateFilmData(releaseDate);
-        this.name = name.trim();
-        this.description = description.trim();
-        this.releaseDate = releaseDate.trim();
-        this.duration = duration;
+    public Film(Integer id,
+                @NotBlank String name,
+                @Size(max = 200) String description,
+                @NotBlank String releaseDate,
+                @Positive int duration,
+                ArrayList<FilmData> genreList,
+                Set<Integer> likes,
+                FilmData mpaRating) {
         if (id != null) {
             this.id = id;
         }
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.genres = genreList;
+        this.likes = likes;
+        this.mpa = mpaRating;
     }
 
-    private void validateFilmData(String releaseDate) {
+    public void validateFilmData(String releaseDate) {
         if (LocalDate.parse(releaseDate, dateTimeFormatter).isBefore(LocalDate.of(1895, 12, 28))) {
             log.error("Release date {} is before than 28.12.1895", releaseDate);
             throw new ValidationException(String.format("Release date \"%s\" is before than 28.12.1895", releaseDate));
         }
-    }
-
-    public void setLike(Integer userId) {
-        likes.add(userId);
-    }
-
-    public void deleteLike(Integer userId) {
-        likes.remove(userId);
     }
 }

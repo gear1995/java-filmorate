@@ -15,6 +15,7 @@ import java.util.Set;
 @Data
 @Slf4j
 public class User {
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private int id;
     @Email
     private String email;
@@ -23,11 +24,14 @@ public class User {
     private String name;
     @NotBlank
     private String birthday;
-    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private Set<Integer> friends = new HashSet<>();
 
-    public User(@Email String email, @NotBlank String login, @NotBlank String birthday, String name, Integer id) {
-        validateUser(login.trim(), birthday.trim());
+    public User(@Email String email,
+                @NotBlank String login,
+                @NotBlank String birthday,
+                String name,
+                Integer id,
+                Set<Integer> friends) {
         this.email = email.trim();
         this.login = login.trim();
         this.birthday = birthday.trim();
@@ -39,9 +43,12 @@ public class User {
         if (id != null) {
             this.id = id;
         }
+        if (friends != null) {
+            this.friends = friends;
+        }
     }
 
-    private void validateUser(String login, String birthday) {
+    public void validateUser(String login, String birthday) {
         if (login.contains(" ")) {
             log.error("Login {} contains space", login);
             throw new ValidationException(String.format("Login \"%s\" contains space", login));
